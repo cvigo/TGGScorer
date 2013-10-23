@@ -1,57 +1,89 @@
-<div class="container-fluid" ng-init="initModel()" xmlns="http://www.w3.org/1999/html">
-    <div class="navbar navbar-fixed-top">
-        <div class="navbar-inner">
-            <div class="container-fluid">
-                <form class="navbar-form pull-left form-inline">
-                    <label class="checkbox">
-                        <input type="checkbox" ng-model="oneAtATime">Un solo grupo visible
-                    </label>
-                    <button class="btn btn-small" type="button" ng-click="reloadResults()">Refrescar</button>
-                </form>
-                <form class="navbar-search pull-right">
-                    <input type="text" class="search-query" placeholder="Filtro por nick" ng-model="playerFilter"
+<div ng-init="initModel()" xmlns="http://www.w3.org/1999/html">
+    <nav class="navbar navbar-fixed-top" role="navigation">
+        <div class="row">
+            <div class="col-xs-1"></div>
+            <div class="col-xs-2">
+                <button class="btn btn-default navbar-text" ng-click="reloadResults()">
+                    <span class="glyphicon glyphicon-refresh"></span>
+                </button>
+            </div>
+            <div class="col-xs-8">
+                <div class="input-group navbar-text">
+                    <input type="search" class="form-control search-query"
+                           placeholder="Filtro por nick"
+                           ng-model="playerFilter"
                            typeahead="player for player in playerList | filter:$viewValue">
-                </form>
+                    <span class="input-group-addon" ng-click="playerFilter=''">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </span>
+                </div>
+            </span>
+            </div>
+            <div class="col-xs-1"></div>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top: 70px;">
+        <div class="panel col-xs-12 col-sm-6 col-md-4 col-lg-3" ng-repeat="group in groups | filter:playerFilter">
+            <div class="panel panel-info">
+                <div class="panel-heading matches-heading" id="matchgroup">
+                    <div class="col-xs-12 row panel-title">
+                        <h5 class="col-xs-8 text-left">{{getGroupStartTime(group.number-1)}}</h5>
+                        <button class="pull-right btn btn-sm btn-primary" ng-click="sendResult(group.number)">Enviar!</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal" role="form" id="formgroup">
+                        <div id="match" ng-repeat="match in group.matches">
+                            <div class="form-group">
+
+
+                                <div class="col-xs-5 text-center"><strong>{{match.leftPlayer}}</strong></div>
+                                <div class="col-xs-2 text-center">vs</div>
+                                <div class="col-xs-5 text-center"><strong>{{match.rightPlayer}}</strong></div>
+
+                                <div class="col-xs-12">
+                                    <div class="input-group">
+                                        <span class="input-group-btn" ng-click="updateHole(match, -1)">
+                                            <button class="btn btn-default" type="button">
+                                                <span class="glyphicon glyphicon-chevron-left"></span>
+                                            </button>
+                                        </span>
+                                        <span class="form-control text-center">{{match | prettyhole}}</span>
+                                        <span class="input-group-btn" ng-click="updateHole(match, 1)">
+                                            <button class="btn btn-default" type="button">
+                                                <span class="glyphicon glyphicon-chevron-right"></span>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <div class="input-group">
+                                        <span class="input-group-btn" ng-click="updateMatch(match, -1)">
+                                            <button class="btn btn-default" type="button">
+                                                <span class="glyphicon glyphicon-chevron-left"></span>
+                                            </button>
+                                        </span>
+                                        <span class="form-control text-center "><small>{{match | prettyresult}}</small></span>
+                                        <span class="input-group-btn" ng-click="updateMatch(match, 1)">
+                                            <button class="btn btn-default" type="button">
+                                                <span class="glyphicon glyphicon-chevron-right"></span>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="container-fluid" style="margin-top: 40px">
-        <accordion id="allgroups" close-others="oneAtATime">
-            <div class="row-fluid" ng-repeat="group in groups | filter:playerFilter">
-                <accordion-group id="matchgroup" heading="#{{group.number}}: {{getGroupHeading(group.number-1)}}">
-                    <form class="form-inline" id="formgroup" ng-submit="submitSingleGroup(group)">
-                        <div id="match" ng-repeat="match in group.matches">
-                            <div class="row-fluid">
-                                <div class="input-append">
-                                    <input class="span2 text-center numeric integer" type="text" ng-model="match.result.h" ng-readonly="true">
-                                    <button class="btn" ng-click="updateHole(match, -1)">-</button>
-                                    <button class="btn" ng-click="updateHole(match, 1)">+</button>
-                                </div>
-                            </div>
-                            <p>
-                            <div class="row-fluid">
-                                <div class="span12 input-append">
-                                    <input class="text-center uneditable-input" type="text" ng-model="getScoreText(match.leftPlayer, match.rightPlayer, match.result.r, match.result.h).text">
-                                    <span class="btn text-center" ng-click="updateMatch(match, -1)">{{match.leftPlayer}}++</span>
-                                    <span class="btn text-center" ng-click="updateMatch(match, 1)">{{match.rightPlayer}}++</span>
-                                </div>
-                            </div>
-                            <div class="row-fluid">
-                                <span class="alert-success" ng-show="getScoreText(match.leftPlayer, match.rightPlayer, match.result.r, match.result.h).finished">Finalizado!</span>
-                            </div>
-                            <hr>
-                        </div>
-                        <button class="active" ng-click="sendResult(group.number)">Enviar!</button>
-                    </form>
-                </accordion-group>
-            </div>
-        </accordion>
-    </div>
-
-    <div class="navbar navbar-fixed-bottom">
+    <div class="navbar navbar-default navbar-fixed-bottom" role="navigation">
         <div class="navbar-inner">
-            <div class="container-fluid">
+            <div class="container">
                 <alert type="lastMessage.type">{{lastMessage.text}}</alert>
                 {{projectedResult()}} {{finalResult()}}
             </div>

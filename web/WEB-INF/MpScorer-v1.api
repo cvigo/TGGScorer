@@ -193,6 +193,27 @@
         "body" : "autoTemplate(backendResponse)"
       }
     },
+    "mpscorer.mpscorerapi.addMatch" : {
+      "path" : "tournament/{tournamentId}/match",
+      "httpMethod" : "POST",
+      "scopes" : [ ],
+      "audiences" : [ ],
+      "clientIds" : [ ],
+      "rosyMethod" : "com.galaxiagolf.matchplay.MatchPlayScorer.addMatch",
+      "request" : {
+        "parameters" : {
+          "tournamentId" : {
+            "type" : "int64",
+            "required" : true
+          }
+        },
+        "body" : "autoTemplate(backendRequest)",
+        "bodyName" : "resource"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
     "mpscorer.mpscorerapi.updateMatch" : {
       "path" : "tournament/{tournamentId}/match/{matchId}",
       "httpMethod" : "POST",
@@ -207,27 +228,6 @@
             "required" : true
           },
           "matchId" : {
-            "type" : "int64",
-            "required" : true
-          }
-        },
-        "body" : "autoTemplate(backendRequest)",
-        "bodyName" : "resource"
-      },
-      "response" : {
-        "body" : "autoTemplate(backendResponse)"
-      }
-    },
-    "mpscorer.mpscorerapi.addMatch" : {
-      "path" : "tournament/{tournamentId}/match",
-      "httpMethod" : "POST",
-      "scopes" : [ ],
-      "audiences" : [ ],
-      "clientIds" : [ ],
-      "rosyMethod" : "com.galaxiagolf.matchplay.MatchPlayScorer.addMatch",
-      "request" : {
-        "parameters" : {
-          "tournamentId" : {
             "type" : "int64",
             "required" : true
           }
@@ -413,20 +413,20 @@
           "$ref" : "SimpleResult"
         }
       },
-      "com.galaxiagolf.matchplay.MatchPlayScorer.updateMatch" : {
-        "request" : {
-          "$ref" : "Match"
-        },
-        "response" : {
-          "$ref" : "Match"
-        }
-      },
       "com.galaxiagolf.matchplay.MatchPlayScorer.addMatch" : {
         "request" : {
           "$ref" : "Match"
         },
         "response" : {
           "$ref" : "TournamentPOJO"
+        }
+      },
+      "com.galaxiagolf.matchplay.MatchPlayScorer.updateMatch" : {
+        "request" : {
+          "$ref" : "Match"
+        },
+        "response" : {
+          "$ref" : "Match"
         }
       },
       "com.galaxiagolf.matchplay.MatchPlayScorer.updateTournament" : {

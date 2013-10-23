@@ -9,7 +9,7 @@ var MsgText =
 };
 
 
-var appModule = angular.module("MainViewModule", ["BackendModule"]);
+var appModule = angular.module("MainViewModule", ["BackendModule", "ScorerFilters"]);
 
 appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Result", function ($scope, $routeParams, TournamentMin, Result)
 {
@@ -114,15 +114,15 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
             for (var j=0, len2=$scope.groups[i].matches.length; j<len2; ++j)
             {
                 var remainingHoles = (18 - $scope.groups[i].matches[j].result.h);
-                if ( Math.abs( $scope.groups[i].matches[j].result) > remainingHoles  ) // match is done: advantage > holes remaining
+                if ( Math.abs( $scope.groups[i].matches[j].result.r) > remainingHoles  ) // match is done: advantage > holes remaining
                 {
-                    if ($scope.groups[i].matches[j].result < 0 ) {++scoreLeft;}
+                    if ($scope.groups[i].matches[j].result.r < 0 ) {++scoreLeft;}
                     else {++scoreRight;}
                 }
-                else if ( Math.abs( $scope.groups[i].matches[j].result) == remainingHoles  ) // check if any player is "dormie" to account for the 1/2 point he assured
+                else if ( Math.abs( $scope.groups[i].matches[j].result.r) == remainingHoles  ) // check if any player is "dormie" to account for the 1/2 point he assured
                 {
-                    if ($scope.groups[i].matches[j].result < 0 ) {scoreLeft+=0.5;}
-                    else if ($scope.groups[i].matches[j].result > 0) {scoreRight+=0.5;}
+                    if ($scope.groups[i].matches[j].result.r < 0 ) {scoreLeft+=0.5;}
+                    else if ($scope.groups[i].matches[j].result.r > 0) {scoreRight+=0.5;}
                     else {scoreLeft += 0.5; scoreRight += 0.5;}   // match is halved
                 }
 
@@ -400,7 +400,7 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
         else // match in progress or halved at 18th
         {
             if (absResult==0) // halved, finished only if at 18th
-                return {text:"AS", finished:remaining == 0};
+                return {text:"AS", finished:hole == 18};
             else
                 return {text:(headingPlayer + " " + absResult + " UP"), finished:false};
 
@@ -501,6 +501,24 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
 
         return "OK";
     }
+
+    /**
+     * @ngdoc function
+     * @name $scope.getGroupStartTime
+     * @function
+     *
+     * @param {long} group index
+     *
+     * @description
+     * returns the group start time in the format hh:mm
+     *
+     * @return {string} "OK" or descriptive error code
+     */
+    $scope.getGroupStartTime = function(groupId)
+    {
+        return ($scope.groups[groupId].matches[0].startTime).toLocaleTimeString().substr(0,5);
+    }
+
 
 
   }]);
