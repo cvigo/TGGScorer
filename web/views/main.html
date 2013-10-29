@@ -38,9 +38,9 @@
                             <div class="form-group">
 
 
-                                <div class="col-xs-5 text-center"><strong>{{match.leftPlayer}}</strong></div>
+                                <div class="col-xs-5 text-center {{leftTeam}}"><strong>{{match.leftPlayer}}</strong></div>
                                 <div class="col-xs-2 text-center">vs</div>
-                                <div class="col-xs-5 text-center"><strong>{{match.rightPlayer}}</strong></div>
+                                <div class="col-xs-5 text-center {{rightTeam}}"><strong>{{match.rightPlayer}}</strong></div>
 
                                 <div class="col-xs-12">
                                     <div class="input-group">
@@ -65,7 +65,7 @@
                                                 <span class="glyphicon glyphicon-chevron-left"></span>
                                             </button>
                                         </span>
-                                        <span class="form-control text-center "><small>{{match | prettyresult}}</small></span>
+                                        <span class="form-control text-center {{getLeadingTeamName(match)}}"><small>{{match | prettyresult}}</small></span>
                                         <span class="input-group-btn" ng-click="updateMatch(match, 1)">
                                             <button class="btn btn-default" type="button">
                                                 <span class="glyphicon glyphicon-chevron-right"></span>

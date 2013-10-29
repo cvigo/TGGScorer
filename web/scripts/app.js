@@ -8,6 +8,11 @@ var appScorer = angular.module("Scorer", ["MainViewModule"])
         templateUrl: "views/main.html",
         controller: "MainCtrl"
       })
+      .when("/scorerView/:tournamentID",
+      {
+        templateUrl: "views/scorer.html",
+        controller: "MainCtrl"
+      })
       .otherwise(
       {
         redirectTo: "/playerView"

@@ -54,7 +54,7 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
         }
     ];*/
     $scope.rightTeam = "";
-    $scope.leftName = "";
+    $scope.leftTeam = "";
     $scope.rightColor = "";
     $scope.leftColor = "";
 
@@ -169,7 +169,7 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
 
                 // this is the right location for the following block to make it run in parallel with the Results retrieval from the server
                 $scope.rightTeam = tournamentData.rightTeamName;
-                $scope.leftName = tournamentData.leftTeamName;
+                $scope.leftTeam = tournamentData.leftTeamName;
 
                 //TODO: store and retrieve colors in Server
                 $scope.rightColor = "";
@@ -325,6 +325,8 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
     {
         $scope.loadTournament($routeParams.tournamentID);
     }
+
+
 /**
  * @ngdoc function
  * @name $scope.allPlayers
@@ -378,11 +380,10 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
  * @param {int} hole last hole played
  *
  * @description
- * Builds a string that represents the current score in a pretty way (1 UP, AS, 2&1, etc)
+ * Builds a string that represents the current score in a pretty way (1 UP, A/S, 2&1, etc)
  *
  * @return {string, bool} pretty score, true if match is resolved
  */
-//TODO: define this as Angular filter
     $scope.getScoreText = function(leftPlayer, rightPlayer, result, hole)
     {
         var absResult = Math.abs(result);
@@ -400,7 +401,7 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
         else // match in progress or halved at 18th
         {
             if (absResult==0) // halved, finished only if at 18th
-                return {text:"AS", finished:hole == 18};
+                return {text:"A/S", finished:hole == 18};
             else
                 return {text:(headingPlayer + " " + absResult + " UP"), finished:false};
 
@@ -517,6 +518,29 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
     $scope.getGroupStartTime = function(groupId)
     {
         return ($scope.groups[groupId].matches[0].startTime).toLocaleTimeString().substr(0,5);
+    }
+
+    /**
+     * @ngdoc function
+     * @name $scope.getLeadingTeamName
+     * @function
+     *
+     * @param {match} the match
+     *
+     * @description
+     * Returns the team name of the player who is ahead in the match
+     *
+     * @return {string} Team name, or "allsquare" if the match is AS
+     */
+    $scope.getLeadingTeamName = function(match)
+    {
+        if (match.result.r > 0)
+            return $scope.rightTeam;
+        else if (match.result.r < 0)
+            return $scope.leftTeam;
+        else
+        return "allsquare";
+
     }
 
 

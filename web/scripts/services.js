@@ -37,3 +37,7 @@ serverModule.factory("Match", function($resource)
               {tournamentID:"@tID", matchId:"@id"});
 });
 
+
+//var dataModule = angular.module("DataModule", ["BackendModule"]);
+
+

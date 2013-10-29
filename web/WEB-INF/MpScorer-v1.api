@@ -145,30 +145,6 @@
         "body" : "autoTemplate(backendResponse)"
       }
     },
-    "mpscorer.mpscorerapi.deleteMatch" : {
-      "path" : "tournament/{tournamentId}/match/{matchId}",
-      "httpMethod" : "DELETE",
-      "scopes" : [ ],
-      "audiences" : [ ],
-      "clientIds" : [ ],
-      "rosyMethod" : "com.galaxiagolf.matchplay.MatchPlayScorer.deleteMatch",
-      "request" : {
-        "parameters" : {
-          "tournamentId" : {
-            "type" : "int64",
-            "required" : true
-          },
-          "matchId" : {
-            "type" : "int64",
-            "required" : true
-          }
-        },
-        "body" : "empty"
-      },
-      "response" : {
-        "body" : "autoTemplate(backendResponse)"
-      }
-    },
     "mpscorer.mpscorerapi.getMatchResult" : {
       "path" : "tournament/{tournamentId}/result/{matchId}",
       "httpMethod" : "GET",
@@ -193,22 +169,25 @@
         "body" : "autoTemplate(backendResponse)"
       }
     },
-    "mpscorer.mpscorerapi.addMatch" : {
-      "path" : "tournament/{tournamentId}/match",
-      "httpMethod" : "POST",
+    "mpscorer.mpscorerapi.deleteMatch" : {
+      "path" : "tournament/{tournamentId}/match/{matchId}",
+      "httpMethod" : "DELETE",
       "scopes" : [ ],
       "audiences" : [ ],
       "clientIds" : [ ],
-      "rosyMethod" : "com.galaxiagolf.matchplay.MatchPlayScorer.addMatch",
+      "rosyMethod" : "com.galaxiagolf.matchplay.MatchPlayScorer.deleteMatch",
       "request" : {
         "parameters" : {
           "tournamentId" : {
             "type" : "int64",
             "required" : true
+          },
+          "matchId" : {
+            "type" : "int64",
+            "required" : true
           }
         },
-        "body" : "autoTemplate(backendRequest)",
-        "bodyName" : "resource"
+        "body" : "empty"
       },
       "response" : {
         "body" : "autoTemplate(backendResponse)"
@@ -228,6 +207,27 @@
             "required" : true
           },
           "matchId" : {
+            "type" : "int64",
+            "required" : true
+          }
+        },
+        "body" : "autoTemplate(backendRequest)",
+        "bodyName" : "resource"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "mpscorer.mpscorerapi.addMatch" : {
+      "path" : "tournament/{tournamentId}/match",
+      "httpMethod" : "POST",
+      "scopes" : [ ],
+      "audiences" : [ ],
+      "clientIds" : [ ],
+      "rosyMethod" : "com.galaxiagolf.matchplay.MatchPlayScorer.addMatch",
+      "request" : {
+        "parameters" : {
+          "tournamentId" : {
             "type" : "int64",
             "required" : true
           }
@@ -403,20 +403,12 @@
           "$ref" : "SimpleResultCollection"
         }
       },
-      "com.galaxiagolf.matchplay.MatchPlayScorer.deleteMatch" : {
-        "response" : {
-          "$ref" : "TournamentPOJO"
-        }
-      },
       "com.galaxiagolf.matchplay.MatchPlayScorer.getMatchResult" : {
         "response" : {
           "$ref" : "SimpleResult"
         }
       },
-      "com.galaxiagolf.matchplay.MatchPlayScorer.addMatch" : {
-        "request" : {
-          "$ref" : "Match"
-        },
+      "com.galaxiagolf.matchplay.MatchPlayScorer.deleteMatch" : {
         "response" : {
           "$ref" : "TournamentPOJO"
         }
@@ -427,6 +419,14 @@
         },
         "response" : {
           "$ref" : "Match"
+        }
+      },
+      "com.galaxiagolf.matchplay.MatchPlayScorer.addMatch" : {
+        "request" : {
+          "$ref" : "Match"
+        },
+        "response" : {
+          "$ref" : "TournamentPOJO"
         }
       },
       "com.galaxiagolf.matchplay.MatchPlayScorer.updateTournament" : {

@@ -1,6 +1,85 @@
-.matches-heading {
+.matches-heading
+{
     padding-right: 0px;
     padding-left: 0px;
     padding-top: 0px;
     padding-bottom: 0px;
 }
+
+.Bucaneros
+{
+    background-color: #d43f3a;
+    color: #ffffff;
+}
+
+.Corsarios
+{
+    background-color: #2a6496;
+    color: #ffffff;
+}
+
+.Filibusteros
+{
+    background-color: #222222;
+    color: #ffffff;
+
+}
+
+.Cosacos
+{
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.neutral,
+.allsquare
+ {
+     background-color: #f8f8f8;
+     color: #000000;
+ }
+
+.scorerpanel
+{
+    font-weight: bold;
+    border-style: solid;
+    border-width: 1px;
+    border-color: lightgrey;
+    box-shadow: 3px 3px 3px #888888;
+    margin-bottom: 4px;
+    margin-top: 4px;
+    white-space: nowrap;
+    overflow-x: hidden;
+}
+
+.holemobile
+{
+    padding-bottom: 10px;
+    padding-top: 10px;
+}
+
+@media (max-width: 767px)
+{
+    .scorerpanel
+    {
+        font-weight: normal;
+    }
+}
+
+.galaxia-background
+{
+    /*background-color: oldlace;*/
+}
+
+/*@media (max-width: 500px)*/
+/*{*/
+    /*.responsivefontsize*/
+    /*{*/
+        /*font-size: smaller;*/
+    /*}*/
+
+/*}*/
+
+
+
+
+
