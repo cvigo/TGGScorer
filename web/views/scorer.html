@@ -29,20 +29,30 @@
             </div>
             <!-- Mobile design -->
             <div class="visible-xs row scorerpanel">
-                <div class="col-xs-8 text-left"><strong>{{leftTeam}}</strong></div>
-                <div class="col-xs-4 text-center {{leftTeam}}"><strong>{{projectedResult().scoreL}}</strong></div>
-                <div class="col-xs-8 text-left"><strong>{{rightTeam}}</strong></div>
-                <div class="col-xs-4 text-center {{rightTeam}}"><strong>{{projectedResult().scoreR}}</strong></div>
+                <div class="col-xs-10">
+                    <div class="row">
+                        <div class="col-xs-8 text-left"><strong>{{leftTeam}}</strong></div>
+                        <div class="col-xs-4 text-center {{leftTeam}}"><strong>{{projectedResult().scoreL}}</strong></div>
+                        <div class="col-xs-8 text-left"><strong>{{rightTeam}}</strong></div>
+                        <div class="col-xs-4 text-center {{rightTeam}}"><strong>{{projectedResult().scoreR}}</strong></div>
+                    </div>
+                </div>
+                <div class="col-xs-2">
+                    <div class="row">
+                        <div class="pull-right btn btn-primary button-refresh" ng-click="reloadResults()">
+                            <span class="glyphicon glyphicon-refresh"></span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!--individual results-->
         <div class="container" id="results">
-            <div class="" id="group" ng-repeat="group in groups | filter:playerFilter">
-                <div class="row" id="match" ng-repeat="match in group.matches">
-
+            <div class="my-repeat-animation" id="group{{$index}}" ng-repeat="group in groups | filter:playerFilter">
+                <div class="row my-repeat-animation" ng-repeat="match in group.matches">
                     <!-- Tablet and Desktop design -->
-                    <div class="hidden-xs">
+                    <div id="match_desktop_{{match.id}}" class="hidden-xs score-update-animation">
                         <div id="leftside" class="col-sm-5">
                             <div class="row scorerpanel {{getLeadingTeamName(match)}} " ng-class="{neutral:match.result.r >= 0}">
                                 <div class="col-sm-4 text-center">
@@ -63,14 +73,14 @@
                             </div>
                         </div>
                         <div id="lastupdate" class=" col-sm-1">
-                            <div class="scorerpanel neutral">
+                            <div class="scorerpanel text-center neutral">
                                 <small>{{match.result.ts | elapsedMM}}</small>
                             </div>
                         </div>
                     </div>
 
                     <!-- Mobile design -->
-                    <div class="visible-xs">
+                    <div id="match_mobile_{{match.id}}" class="visible-xs score-update-animation">
                         <div id="playersside" class="col-xs-5">
                             <div class="row scorerpanel">
                                 <div class="col-xs-12 text-left neutral">{{match.leftPlayer}}</div>

@@ -1,77 +1,83 @@
 <div ng-init="initModel()" xmlns="http://www.w3.org/1999/html">
     <nav class="navbar navbar-fixed-top" role="navigation">
-        <div class="row">
-            <div class="col-xs-1"></div>
-            <div class="col-xs-2">
-                <button class="btn btn-default navbar-text" ng-click="reloadResults()">
-                    <span class="glyphicon glyphicon-refresh"></span>
-                </button>
-            </div>
-            <div class="col-xs-8">
-                <div class="input-group navbar-text">
-                    <input type="search" class="form-control search-query"
-                           placeholder="Filtro por nick"
-                           ng-model="playerFilter"
-                           typeahead="player for player in playerList | filter:$viewValue">
-                    <span class="input-group-addon" ng-click="playerFilter=''">
-                        <span class="glyphicon glyphicon-remove"></span>
-                    </span>
+        <div class="col-xs-12">
+            <div class="row">
+                <div class="col-xs-2">
+                    <button class="btn btn-sm btn-default navbar-text" ng-click="reloadResults()">
+                        <span class="glyphicon glyphicon-refresh"></span>
+                    </button>
                 </div>
-            </span>
+                <div class="col-xs-10 col-sm-5">
+                    <div class="input-group navbar-text">
+                        <input type="search" class="form-control input-sm search-query"
+                               placeholder="Filtro por nick"
+                               list="players"
+                               ng-model="playerFilter">
+                               <datalist id="players">
+                                    <option ng-repeat="player in playerList" value="{{player}}">
+                                </datalist>
+                        <span class="input-group-addon" ng-click="playerFilter=''">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </span>
+                    </div>
+                </div>
             </div>
-            <div class="col-xs-1"></div>
+        </div>
+        <div class="col-xs-12 my-repeat-animation"  ng-show="alertVisible">
+            <div id="#alertPanel" class="alert alert-dismissable alert-{{lastMessage.type}} fade in text-center">
+                <!--<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>-->
+                <button type="button" class="close" aria-hidden="true" ng-click="alertVisible=false">×</button>
+                {{lastMessage.text}}
+            </div>
         </div>
     </nav>
 
-    <div class="container" style="padding-top: 70px;">
-        <div class="panel col-xs-12 col-sm-6 col-md-4 col-lg-3" ng-repeat="group in groups | filter:playerFilter">
+    <div class="container" style="padding-top: 65px;">
+        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 my-repeat-animation" ng-repeat="group in groups | filter:playerFilter">
             <div class="panel panel-info">
                 <div class="panel-heading matches-heading" id="matchgroup">
-                    <div class="col-xs-12 row panel-title">
-                        <h5 class="col-xs-8 text-left">{{getGroupStartTime(group.number-1)}}</h5>
-                        <button class="pull-right btn btn-sm btn-primary" ng-click="sendResult(group.number)">Enviar!</button>
+                    <div class="panel-title">
+                        <div class="row">
+                            <div class="col-xs-7">
+                                <div class="text-left">{{getGroupStartTime(group.number-1)}}</div>
+                            </div>
+                            <div class="col-xs-5">
+                                <button class="btn-block btn btn-sm btn-primary" data-loading-text="Enviando..." data-sent-text="Enviado!" data-error-text="ERROR :-(" ng-click="sendResult(group.number, $event)">Enviar!</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="panel-body">
-                    <form class="form-horizontal" role="form" id="formgroup">
+                    <form class="" role="form" id="formgroup">
                         <div id="match" ng-repeat="match in group.matches">
                             <div class="form-group">
-
-
-                                <div class="col-xs-5 text-center {{leftTeam}}"><strong>{{match.leftPlayer}}</strong></div>
-                                <div class="col-xs-2 text-center">vs</div>
-                                <div class="col-xs-5 text-center {{rightTeam}}"><strong>{{match.rightPlayer}}</strong></div>
-
-                                <div class="col-xs-12">
-                                    <div class="input-group">
-                                        <span class="input-group-btn" ng-click="updateHole(match, -1)">
-                                            <button class="btn btn-default" type="button">
-                                                <span class="glyphicon glyphicon-chevron-left"></span>
-                                            </button>
-                                        </span>
-                                        <span class="form-control text-center">{{match | prettyhole}}</span>
-                                        <span class="input-group-btn" ng-click="updateHole(match, 1)">
-                                            <button class="btn btn-default" type="button">
-                                                <span class="glyphicon glyphicon-chevron-right"></span>
-                                            </button>
-                                        </span>
-                                    </div>
+                                <div class="col-xs-6 text-center scorerpanel {{leftTeam}}"><span>{{match.leftPlayer}}</span></div>
+                                <div class="col-xs-6 text-center scorerpanel {{rightTeam}}"><span>{{match.rightPlayer}}</span></div>
+                                <div class="input-group">
+                                    <span class="input-group-btn" ng-click="updateHole(match, -1)">
+                                        <button class="btn btn-sm btn-default" type="button">
+                                            <span class="glyphicon glyphicon-chevron-left"></span>
+                                        </button>
+                                    </span>
+                                    <span class="form-control input-sm text-center">{{match | prettyhole}}</span>
+                                    <span class="input-group-btn" ng-click="updateHole(match, 1)">
+                                        <button class="btn btn-sm btn-default" type="button">
+                                            <span class="glyphicon glyphicon-chevron-right"></span>
+                                        </button>
+                                    </span>
                                 </div>
-
-                                <div class="col-xs-12">
-                                    <div class="input-group">
-                                        <span class="input-group-btn" ng-click="updateMatch(match, -1)">
-                                            <button class="btn btn-default" type="button">
-                                                <span class="glyphicon glyphicon-chevron-left"></span>
-                                            </button>
-                                        </span>
-                                        <span class="form-control text-center {{getLeadingTeamName(match)}}"><small>{{match | prettyresult}}</small></span>
-                                        <span class="input-group-btn" ng-click="updateMatch(match, 1)">
-                                            <button class="btn btn-default" type="button">
-                                                <span class="glyphicon glyphicon-chevron-right"></span>
-                                            </button>
-                                        </span>
-                                    </div>
+                                <div class="input-group">
+                                    <span class="input-group-btn" ng-click="updateMatch(match, -1)">
+                                        <button class="btn btn-sm btn-default" type="button">
+                                            <span class="glyphicon glyphicon-chevron-left"></span>
+                                        </button>
+                                    </span>
+                                    <span class="form-control input-sm nowrap text-center team-color-animation" ng-class="getLeadingTeamName(match)">{{match | prettyresult}}</span>
+                                    <span class="input-group-btn" ng-click="updateMatch(match, 1)">
+                                        <button class="btn btn-sm btn-default" type="button">
+                                            <span class="glyphicon glyphicon-chevron-right"></span>
+                                        </button>
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -81,12 +87,16 @@
         </div>
     </div>
 
+    <!--
     <div class="navbar navbar-default navbar-fixed-bottom" role="navigation">
         <div class="navbar-inner">
             <div class="container">
-                <alert type="lastMessage.type">{{lastMessage.text}}</alert>
-                {{projectedResult()}} {{finalResult()}}
+                <div id="alertPanel" class="alert alert-block fade in">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    {{lastMessage.text}}
+                </div>
             </div>
         </div>
     </div>
+    -->
 </div>

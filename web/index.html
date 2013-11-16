@@ -19,16 +19,17 @@
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css styles/main.css -->
 
-    <link href="styles/bootstrap.css" rel="stylesheet">
-    <link href="styles/bootstrap-theme.css" rel="stylesheet">
+    <link href="styles/bootstrap.min.css" rel="stylesheet">
+    <link href="styles/bootstrap-theme.min.css" rel="stylesheet">
     <link href="styles/main.css" rel="stylesheet">
-
+    <link href="styles/animate-custom.css" rel="stylesheet">
+    <link href="styles/typeahead.js-bootstrap.css" rel="stylesheet">
 
     <!-- endbuild -->
 </head>
 
 <body>
-<!--[if lt IE 7]>
+<!--[if lt IE 8]>
 <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser
     today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better
     experience this site.</p>
@@ -42,14 +43,22 @@
 <!-- Add your site or application content here -->
 <div class="" ng-view></div>
 
-<script src="components/angular/angular.js"></script>
-<script src="components/angular-resource/angular-resource.js"></script>
-<script src="components/angular-cookies/angular-cookies.js"></script>
+<!--<script src="components/angular/angular.js"></script>-->
+<!--<script src="components/angular-resource/angular-resource.js"></script>-->
+<!--<script src="components/angular-cookies/angular-cookies.js"></script>-->
+
+<script src="components/angular.v1.2/angular.js"></script>
+<script src="components/angular.v1.2/angular-touch.js"></script>
+<script src="components/angular.v1.2/angular-route.js"></script>
+<script src="components/angular.v1.2/angular-animate.js"></script>
+<script src="components/angular.v1.2/angular-resource.js"></script>
+<script src="components/angular.v1.2/angular-cookies.js"></script>
 <!--<script src="components/ui-bootstrap/ui-bootstrap-tpls-0.6.0-SNAPSHOT.js"></script>-->
 
 <!-- build:js scripts/scripts.js -->
-<script src="//code.jquery.com/jquery.js"></script>
-<script src="scripts/bootstrap.js"></script>
+<script src="components/jQuery/jquery.min.js"></script>
+<script src="scripts/bootstrap.min.js"></script>
+<script src="components/typeahead/typeahead.min.js"></script>
 <script src="scripts/filters.js"></script>
 <script src="scripts/services.js"></script>
 <script src="scripts/app.js"></script>

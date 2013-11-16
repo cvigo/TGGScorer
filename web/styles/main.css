@@ -1,9 +1,17 @@
 .matches-heading
 {
-    padding-right: 0px;
-    padding-left: 0px;
-    padding-top: 0px;
-    padding-bottom: 0px;
+    padding-right: 3px;
+    padding-left: 3px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+.button-refresh
+{
+    margin-right: 3px;
+    margin-left: 3px;
+    margin-top: 3px;
+    margin-bottom: 3px;
 }
 
 .Bucaneros
@@ -12,24 +20,203 @@
     color: #ffffff;
 }
 
+.team-color-animation
+{
+    -webkit-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+    transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+}
+
+.team-color-animation.Bucaneros-add
+{
+    -webkit-animation:1s Bucaneros-on;
+    -moz-animation:1s Bucaneros-on;
+    -o-animation:1s Bucaneros-on;
+    animation:1s Bucaneros-on;
+}
+.team-color-animation.Bucaneros-remove
+{
+    -webkit-animation:1s Bucaneros-off;
+    -moz-animation:1s Bucaneros-off;
+    -o-animation:1s Bucaneros-off;
+    animation:1s Bucaneros-off;
+}
+
+@-webkit-keyframes Bucaneros-on
+{
+    from
+    {
+        background-color: #f8f8f8;
+        color: #000000;
+    }
+    to
+    {
+        background-color: #d43f3a;
+        color: #ffffff;
+    }
+}
+
+@-webkit-keyframes Bucaneros-off
+{
+    from
+    {
+        background-color: #d43f3a;
+        color: #ffffff;
+    }
+    to
+    {
+        background-color: #f8f8f8;
+        color: #000000;
+    }
+}
+
+
 .Corsarios
 {
     background-color: #2a6496;
     color: #ffffff;
 }
 
+.team-color-animation.Corsarios-add
+{
+    -webkit-animation:0.5s Corsarios-on;
+    -moz-animation:0.5s Corsarios-on;
+    -o-animation:0.5s Corsarios-on;
+    animation:0.5s Corsarios-on;
+}
+
+.team-color-animation.Corsarios-remove
+{
+    -webkit-animation:0.5s Corsarios-off;
+    -moz-animation:0.5s Corsarios-off;
+    -o-animation:0.5s Corsarios-off;
+    animation:0.5s Corsarios-off;
+}
+
+@keyframes Corsarios-on {
+    from
+    {
+        background-color: #f8f8f8;
+        color: #000000;
+    }
+    to
+    {
+        background-color: #2a6496;
+        color: #ffffff;
+    }
+}
+
+@keyframes Corsarios-off {
+    from
+    {
+        background-color: #2a6496;
+        color: #ffffff;
+    }
+    to
+    {
+        background-color: #f8f8f8;
+        color: #000000;
+    }
+}
+
+
 .Filibusteros
 {
     background-color: #222222;
     color: #ffffff;
-
 }
+.team-color-animation.Filibusteros-add
+{
+    -webkit-animation:0.5s Filibusteros-on;
+    -moz-animation:0.5s Filibusteros-on;
+    -o-animation:0.5s Filibusteros-on;
+    animation:0.5s Filibusteros-on;
+}
+
+.team-color-animation.Filibusteros-remove
+{
+    -webkit-animation:0.5s Filibusteros-off;
+    -moz-animation:0.5s Filibusteros-off;
+    -o-animation:0.5s Filibusteros-off;
+    animation:0.5s Filibusteros-off;
+}
+
+@keyframes Filibusteros-on
+{
+    from
+    {
+        background-color: #f8f8f8;
+        color: #000000;
+    }
+    to
+    {
+        background-color: #222222;
+        color: #ffffff;
+    }
+}
+
+@keyframes Filibusteros-off
+{
+    from
+    {
+        background-color: #222222;
+        color: #ffffff;
+    }
+    to
+    {
+        background-color: #f8f8f8;
+        color: #000000;
+    }
+}
+
 
 .Cosacos
 {
     background-color: #ffffff;
     color: #000000;
 }
+
+.team-color-animation.Cosacos-add
+{
+    -webkit-animation:0.5s Cosacos-on;
+    -moz-animation:0.5s Cosacos-on;
+    -o-animation:0.5s Cosacos-on;
+    animation:0.5s Cosacos-on;
+}
+
+.team-color-animation.Cosacos-remove
+{
+    -webkit-animation:0.5s Cosacos-off;
+    -moz-animation:0.5s Cosacos-off;
+    -o-animation:0.5s Cosacos-off;
+    animation:0.5s Cosacos-off;
+}
+
+@keyframes Cosacos-on {
+    from
+    {
+        background-color: #f8f8f8;
+        color: #000000;
+    }
+    to
+    {
+        background-color: #ffffff;
+        color: #000000;
+    }
+}
+
+@keyframes Cosacos-off {
+    from
+    {
+        background-color: #ffffff;
+        color: #000000;
+    }
+    to
+    {
+        background-color: #f8f8f8;
+        color: #000000;
+    }
+}
+
 
 .neutral,
 .allsquare
@@ -47,6 +234,12 @@
     box-shadow: 3px 3px 3px #888888;
     margin-bottom: 4px;
     margin-top: 4px;
+    white-space: nowrap;
+    overflow-x: hidden;
+}
+
+.nowrap
+{
     white-space: nowrap;
     overflow-x: hidden;
 }
@@ -80,6 +273,41 @@
 /*}*/
 
 
+.my-repeat-animation.ng-enter
+{
+    -webkit-animation: bounceInLeft 1s;
+    -moz-animation: bounceInLeft 1s;
+    -ms-animation: bounceInLeft 1s;
+    animation: bounceInLeft 1s;
+}
+
+.my-repeat-animation.ng-move
+{
+    -webkit-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+    transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+}
 
 
+.my-repeat-animation.ng-leave
+{
+    -webkit-animation: bounceOutRight 1s;
+    -moz-animation: bounceOutRight 1s;
+    -ms-animation: bounceOutRight 1s;
+    animation: bounceOutRight 1s;
 
+}
+
+.score-update-animation.ng-hide-add
+{
+    -webkit-animation: flipOutX 2s;
+    -moz-animation: flipOutX 2s;
+    -ms-animation: flipOutX 2s;
+    animation: flipOutX 2s;
+}
+.score-update-animation.ng-hide-remove
+{
+    -webkit-animation: flipInX 2s;
+    -moz-animation: flipInX 2s;
+    -ms-animation: flipInX 2s;
+    animation: flipInX 2s;
+}

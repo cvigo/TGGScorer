@@ -382,12 +382,14 @@ public class MatchPlayScorer
         if (match==null)
             throw new NotFoundException("match not found");
 
-        match.setHole(newData.getH());
-        match.setResult(newData.getR());
-        match.setTimestamp(new Date());  // get current timestamp
+        if ( match.getHole() != newData.getH() || match.getResult() != newData.getR() )
+        {
+            match.setHole(newData.getH());
+            match.setResult(newData.getR());
+            match.setTimestamp(new Date());  // get current timestamp
 
-        ofy().save().entity(match).now();
-        return;
+            ofy().save().entity(match).now();
+        }
     }
 
 

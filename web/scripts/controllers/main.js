@@ -8,16 +8,35 @@ var MsgText =
     GAMEOVER:"El partido tendría que haber acabado ya!!"
 };
 
+var alertTimeout = 3000;
+
 
 var appModule = angular.module("MainViewModule", ["BackendModule", "ScorerFilters"]);
 
-appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Result", function ($scope, $routeParams, TournamentMin, Result)
+appModule.controller("MainCtrl",
+                     ["$scope",
+                         "$routeParams",
+                         "$window",
+                         "$timeout",
+                         "$animate",
+                         "TournamentMin",
+                         "Result",
+                         function (
+                             $scope,
+                             $routeParams,
+                             $window,
+                             $timeout,
+                             $animate,
+                             TournamentMin,
+                             Result
+                         )
 {
     //data properties
     $scope.tournamentDataSrv = null; // this will store the tournament data retrieved from the server
     $scope.resultsSrv = []; // this will store de results received from the server
     $scope.playerList = []; // this feeds the players filter in the model
     $scope.groups = [];
+
 /*    $scope.groups = [
         {
             number: 1,
@@ -135,7 +154,7 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
  * @ngdoc function
  * @name $scope.loadTournament
  * @function
- * @param {long} tournamentId The tournament id
+ * @param {number} tournamentId The tournament id
  *
  * @description
  * Loads the tournament data, excepting the results, from the server
@@ -163,7 +182,7 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
                            },
                            function(errMsg) //error callback
                            {
-                               $scope.lastMessage = {type:"error", text:errMsg.data.error.message};
+                               $scope.displayAlertMessage("danger", errMsg.data.error.message, 0);
                            }
                 );
 
@@ -179,7 +198,7 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
             },
             function(errMsg) //error callback
             {
-                $scope.lastMessage = {type:"error", text:errMsg.data.error.message};
+                $scope.displayAlertMessage("danger", errMsg.data.error.message, 0);
             }
         );
     }
@@ -187,7 +206,6 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
  * @ngdoc function
  * @name $scope.reloadResults
  * @function
- * @param {long} tournamentId The tournament id
  *
  * @description
  * Loads the tournament results (only results)
@@ -197,20 +215,62 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
         Result.get({tournamentID:$routeParams.tournamentID},
             function(resultsArray)  // success callback
             {
-                //$scope.resultsSrv = resultsArray.items; // Don't do this, because $scope.resultsSrv would the copied
-                //a new array instance, and references to results in $scope.tournamentDataSrv. would be lost
-                for (r in resultsArray.items)
+                angular.forEach(resultsArray.items, function (result, index)
                 {
-                    $scope.resultsSrv[r].r = resultsArray.items[r].r;
-                    $scope.resultsSrv[r].h = resultsArray.items[r].h;
-                    $scope.resultsSrv[r].ts = resultsArray.items[r].ts;
-                }
+                    //we can trust TS, as the server does not write POSTs that do not actually send a different hole or result than the ones already stored
+                    if ($scope.resultsSrv[index].ts < result.ts) //TS
+                    {
+                        $scope.markAsChanged($scope.resultsSrv[index].id);
 
+                        $timeout(function () // give some time to the animations before updating the numbers
+                                 {
+                                     //$scope.resultsSrv = resultsArray.items; // Don't do this, because $scope.resultsSrv would the copied
+                                     //a new array instance, and references to results in $scope.tournamentDataSrv. would be lost
+                                     $scope.resultsSrv[index].r = result.r;
+                                     $scope.resultsSrv[index].h = result.h;
+                                     $scope.resultsSrv[index].ts = result.ts;
+                                 },
+                                 2000
+                        );
+                    }
+
+                });
             },
             function(errMsg) //error callback
             {
-                $scope.lastMessage = {type:"error", text:errMsg.data.error.message};
+                $scope.displayAlertMessage("danger", errMsg.data.error.message, 0);
             }
+        );
+    }
+
+    /**
+     * @ngdoc function
+     * @name $scope.markAsChanged
+     * @param {number} matchId Match ID number to be marked as modified
+     * @function
+     *
+     * @description
+     * Animates the match row for a nice result update
+     */
+    $scope.markAsChanged = function(matchId)
+    {
+        $("#match_desktop_"+matchId).addClass("ng-hide-add");
+        $("#match_mobile_"+matchId).addClass("ng-hide-add");
+        $timeout(function()
+                 {
+                     $("#match_desktop_"+matchId).removeClass("ng-hide-add");
+                     $("#match_desktop_"+matchId).addClass("ng-hide-remove");
+                     $("#match_mobile_"+matchId).removeClass("ng-hide-add");
+                     $("#match_mobile_"+matchId).addClass("ng-hide-remove");
+                     $timeout(function()
+                              {
+                                  $("#match_desktop_"+matchId).removeClass("ng-hide-remove");
+                                  $("#match_mobile_"+matchId).removeClass("ng-hide-remove");
+                              },
+                              2000
+                     );
+                 },
+                 2000
         );
     }
 
@@ -218,13 +278,16 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
      * @ngdoc function
      * @name $scope.sendResult
      * @function
-     * @param {long} groupNumber The group number as displayed in the template (= array index +1)
+     * @param {number} groupNumber The group number as displayed in the template (= array index +1)
+     * @param {Object event} DOM element that fired the event
      *
      * @description
       * Sends the group results to the Server
      */
-    $scope.sendResult = function(groupNumber)
+    $scope.sendResult = function(groupNumber, event)
     {
+        var btn = $(event.srcElement);
+        btn.button("loading");
         // GAE endpoints not returning arrays whey they should, really sucks. This crappy code is caused by GAE
         for (var match in $scope.groups[groupNumber-1].matches)
         {
@@ -239,10 +302,16 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
                 function(reply)
                 {
                     $scope.lastMessage = {type:"success", text:MsgText.SCORE_SENT};
+                    //$("#alertPanel").show();
+                    btn.button("sent");
+                    $timeout(function () {btn.button("reset")}, 2000);
                 },
                 function(errMsg) //error callback
                 {
-                    $scope.lastMessage = {type:"error", text:errMsg.data.error.message};
+                    $scope.displayAlertMessage("danger", errMsg.data.error.message, 0);
+                    //$("#alertPanel").show();
+                    btn.button("error");
+                    $timeout(function () {btn.button("reset")}, 2000);
                 });
         }
     }
@@ -324,6 +393,12 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
     $scope.initModel = function()
     {
         $scope.loadTournament($routeParams.tournamentID);
+
+        for (m in $scope.tournamentDataSrv.matches)
+        {
+            $scope.matchUpdateControl.push(false);
+
+        }
     }
 
 
@@ -343,6 +418,12 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
             $scope.playerList.push($scope.tournamentDataSrv.matches[match].value.leftPlayer);
             $scope.playerList.push($scope.tournamentDataSrv.matches[match].value.rightPlayer);
         }
+
+        $('input.typeahead-players').typeahead({
+                                                   name: 'players',
+                                                   local: $scope.playerList
+                                               });
+
     }
 
 
@@ -350,13 +431,10 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
  * @ngdoc function
  * @name $scope.getGroupHeading
  * @function
- *
- * @param {int} index The group number
- *
+ * @param {number} index The group number
  * @description
  * Builds a string containg, for the given group, the player names in the form {player1} vs {player2} - {player3} vs {player4}
- *
- * @return {String} string with the player names
+ * @returns {String} string with the player names
  */
     $scope.getGroupHeading = function(index)
     {
@@ -376,13 +454,15 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
  * @name $scope.getScoreText
  * @function
  *
- * @param {int} result if <0 left player ahead, if >0 right player ahead. O all square
- * @param {int} hole last hole played
+ * @param {String} leftPlayer Left player name
+ * @param {String} rightPlayer Right player name
+ * @param {number} result if <0 left player ahead, if >0 right player ahead. O all square
+ * @param {number} hole last hole played
  *
  * @description
  * Builds a string that represents the current score in a pretty way (1 UP, A/S, 2&1, etc)
  *
- * @return {string, bool} pretty score, true if match is resolved
+ * @returns {string, bool} pretty score, true if match is resolved
  */
     $scope.getScoreText = function(leftPlayer, rightPlayer, result, hole)
     {
@@ -415,7 +495,7 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
  * @function
  *
  * @param {match} match to update, reference
- * @param {int} amount number of holes to increase/decrease
+ * @param {number} amount number of holes to increase/decrease
  *
  * @description
  * updates the last hole played for the given match, keeping the number between 0 and 18, making sure the combination
@@ -432,11 +512,11 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
                 break;
 
             case "ADV TOO BIG": // match should have finished, decreasing hole number???
-                $scope.lastMessage = {type:"error", text:MsgText.GAMEOVER};
+                $scope.displayAlertMessage("warning", MsgText.GAMEOVER, alertTimeout);
                 break;
 
             case "ADV BIGGER THAN HOLES PLAYED": // match should have finished, no sense increasing advantage
-                $scope.lastMessage = {type:"error", text:MsgText.MORETHANPLAYED};
+                $scope.displayAlertMessage("warning", MsgText.MORETHANPLAYED, alertTimeout);
                 break;
 
         }
@@ -448,7 +528,7 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
  * @function
  *
  * @param {match} match result to update, reference
- * @param {int} amount <0 increases left player advantage, >0 increases right player advantage. 0 makes no update!
+ * @param {number} amount <0 increases left player advantage, >0 increases right player advantage. 0 makes no update!
  *
  * @description
  * updates the result for the given match, making sure the combination result-hole is consistent
@@ -464,11 +544,12 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
                 break;
 
             case "ADV TOO BIG": // match should have finished, no sense increasing advantage
-                $scope.lastMessage = {type:"error", text:MsgText.GAMEOVER};
-                break;
+                $scope.displayAlertMessage("warning", MsgText.GAMEOVER, alertTimeout);
+
+        break;
 
             case "ADV BIGGER THAN HOLES PLAYED": // match should have finished, no sense increasing advantage
-                $scope.lastMessage = {type:"error", text:MsgText.MORETHANPLAYED};
+                $scope.displayAlertMessage("warning", MsgText.MORETHANPLAYED, alertTimeout);
                 break;
 
         }
@@ -484,7 +565,7 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
  * @description
  * checks if the match result is coherent (advantage < = holes played, advantage <= holes to play - 1, etc.
  *
- * @return {string} "OK" or descriptive error code
+ * @returns {string} "OK" or descriptive error code
  */
     $scope.validateResult = function(match)
     {
@@ -508,12 +589,12 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
      * @name $scope.getGroupStartTime
      * @function
      *
-     * @param {long} group index
+     * @param {number} groupId index
      *
      * @description
      * returns the group start time in the format hh:mm
      *
-     * @return {string} "OK" or descriptive error code
+     * @returns {string} "OK" or descriptive error code
      */
     $scope.getGroupStartTime = function(groupId)
     {
@@ -543,7 +624,33 @@ appModule.controller("MainCtrl", ["$scope", "$routeParams", "TournamentMin", "Re
 
     }
 
+    /**
+     * @ngdoc function
+     * @name $scope.displayAlertMessage
+     * @function
+     *
+     * @param {string} type message type (info, danger, warning, success)
+     * @param {String} text message text
+     * @param {number} timeOut message box will hide after timeOut in miliseconds. Pass 0 to keep it
+     *
+     * @description
+     * Returns the team name of the player who is ahead in the match
+     *
+     */
+    $scope.displayAlertMessage = function(type, text, timeOut)
+    {
+        if ($scope.alertTimeout != null)
+        {
+            $timeout.cancel($scope.alertTimeout);
+        }
 
+        $scope.alertVisible = true;
+        //$window("#alertPanel").dis
+        $scope.lastMessage = {type:type, text:text};
+
+        if (timeOut > 0)
+            $scope.alertTimeout = $timeout(function(){$scope.alertVisible = false;}, timeOut);
+    }
 
   }]);
 

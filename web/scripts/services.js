@@ -36,8 +36,3 @@ serverModule.factory("Match", function($resource)
     return $resource(_API_PATH + "/" + _API_VERSION + "/tournament/:tournamentID/match/:matchId",
               {tournamentID:"@tID", matchId:"@id"});
 });
-
-
-//var dataModule = angular.module("DataModule", ["BackendModule"]);
-
-
