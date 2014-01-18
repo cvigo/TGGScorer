@@ -1,5 +1,6 @@
 package com.galaxiagolf.matchplay;
 
+import com.galaxiagolf.entity.Channel;
 import com.galaxiagolf.matchplay.entity.Match;
 import com.galaxiagolf.matchplay.entity.Tournament;
 import com.googlecode.objectify.Objectify;
@@ -17,6 +18,7 @@ public class OfyService
     {
         factory().register(Match.class);
         factory().register(Tournament.class);
+        factory().register(Channel.class);
         // add all @Entity classes here
     }
 

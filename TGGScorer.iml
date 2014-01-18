@@ -13,16 +13,16 @@
           <root url="file://$MODULE_DIR$/src" />
         </sourceRoots>
       </configuration>
-      <facet type="google-app-engine" name="Google App Engine">
-        <configuration>
-          <sdk-home-path>$MODULE_DIR$/../../appengine-java-sdk-1.8.0</sdk-home-path>
-          <run-enhancer-on-make>true</run-enhancer-on-make>
-          <files-to-enhance>
-            <file path="$MODULE_DIR$/src" />
-          </files-to-enhance>
-          <persistence-api>JDO3</persistence-api>
-        </configuration>
-      </facet>
+    </facet>
+    <facet type="google-app-engine" name="Google App Engine">
+      <configuration>
+        <sdk-home-path>$MODULE_DIR$/../../appengine-java-sdk-1.8.0</sdk-home-path>
+        <run-enhancer-on-make>true</run-enhancer-on-make>
+        <files-to-enhance>
+          <file path="$MODULE_DIR$/src" />
+        </files-to-enhance>
+        <persistence-api>JDO3</persistence-api>
+      </configuration>
     </facet>
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
@@ -39,6 +39,7 @@
     <orderEntry type="library" scope="PROVIDED" name="sass-stdlib" level="application" />
     <orderEntry type="library" name="com.googlecode.objectify:objectify:4.0rc1" level="project" />
     <orderEntry type="library" name="GAE_Libs" level="project" />
+    <orderEntry type="library" name="gson-2.2.4" level="project" />
   </component>
 </module>
 

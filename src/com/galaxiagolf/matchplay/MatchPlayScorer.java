@@ -10,16 +10,19 @@ package com.galaxiagolf.matchplay;
  */
 
 
+import com.galaxiagolf.URIs;
 import com.galaxiagolf.matchplay.entity.Match;
 import com.galaxiagolf.matchplay.entity.SimpleResult;
 import com.galaxiagolf.matchplay.entity.Tournament;
 import com.galaxiagolf.matchplay.entity.TournamentPOJO;
+import com.galaxiagolf.push.PushSrv;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiMethod.HttpMethod;
 import com.google.api.server.spi.config.ApiMethodCacheControl;
 import com.google.api.server.spi.response.BadRequestException;
 import com.google.api.server.spi.response.NotFoundException;
+import com.google.gson.Gson;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.Work;
@@ -44,16 +47,6 @@ import static com.galaxiagolf.matchplay.OfyService.ofy;
 )
 public class MatchPlayScorer
 {
-    private final String TOURNAMENT_LIST_URI = "tournament";
-    private final String TOURNAMENT_ID_PARAM = "tournamentId";
-    private final String TOURNAMENT_URI = TOURNAMENT_LIST_URI + "/{" + TOURNAMENT_ID_PARAM + "}"; // http://server/tournament/1
-    
-    private final String MATCH_LIST_URI = TOURNAMENT_URI + "/match"; // http://server/tournament/1/match
-    private final String MATCH_ID_PARAM = "matchId";
-    private final String MATCH_URI = MATCH_LIST_URI + "/{" + MATCH_ID_PARAM + "}"; // http://server/tournament/1/match/2
-    
-    private final String RESULT_LIST_URI = TOURNAMENT_URI + "/result"; // http://server/tournament/1/result
-    private final String RESULT_URI = RESULT_LIST_URI + "/{" + MATCH_ID_PARAM + "}";  // http://server/tournament/1/result/2
 
 
     ///// TOURNAMENT STUFF /////
@@ -61,7 +54,7 @@ public class MatchPlayScorer
     // Create new tournament method, it does not create any matches
     @ApiMethod(
             name = "mpscorerapi.createTournament",
-            path = TOURNAMENT_LIST_URI,              // http://server/tournament/1/
+            path = URIs.TOURNAMENT_LIST_URI,              // http://server/tournament/1/
             httpMethod = HttpMethod.POST
 //            scopes = {"s0", "s1"},
 //            audiences = {"a0", "a1"},
@@ -85,13 +78,13 @@ public class MatchPlayScorer
     // Simple get method for a Tournament. Gets everything, matches included
     @ApiMethod(
             name = "mpscorerapi.getTournament",
-            path = TOURNAMENT_URI,
+            path = URIs.TOURNAMENT_URI,
             httpMethod = HttpMethod.GET
 //            scopes = {"s0", "s1"},
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public TournamentPOJO getTournament(@Named(TOURNAMENT_ID_PARAM) Long tournamentId) throws NotFoundException
+    public TournamentPOJO getTournament(@Named(URIs.TOURNAMENT_ID_PARAM) Long tournamentId) throws NotFoundException
     {
         Tournament tournament =  ofy().load().type(Tournament.class).id(tournamentId).now();
         if (tournament==null)
@@ -103,13 +96,13 @@ public class MatchPlayScorer
     // Simple update method for a Tournament. It does not update tournament matches, just date and teams
     @ApiMethod(
             name = "mpscorerapi.updateTournament",
-            path = TOURNAMENT_URI,
+            path = URIs.TOURNAMENT_URI,
             httpMethod = HttpMethod.POST
 //            scopes = {"s0", "s1"},
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public TournamentPOJO updateTournament(@Named(TOURNAMENT_ID_PARAM) Long tournamentId, TournamentPOJO newData) throws BadRequestException, NotFoundException
+    public TournamentPOJO updateTournament(@Named(URIs.TOURNAMENT_ID_PARAM) Long tournamentId, TournamentPOJO newData) throws BadRequestException, NotFoundException
     {
         Tournament theTournament = ofy().load().type(Tournament.class).id(tournamentId).now();
         if (theTournament==null)
@@ -127,13 +120,13 @@ public class MatchPlayScorer
     // Simple delete method for a Tournament. It does not delete tournament matches, be aware the orphans
     @ApiMethod(
             name = "mpscorerapi.deleteTournament",
-            path = TOURNAMENT_URI,
+            path = URIs.TOURNAMENT_URI,
             httpMethod = HttpMethod.DELETE
 //            scopes = {"s0", "s1"},
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public void deleteTournament(@Named(TOURNAMENT_ID_PARAM) Long tournamentId)
+    public void deleteTournament(@Named(URIs.TOURNAMENT_ID_PARAM) Long tournamentId)
     {
         ofy().delete().type(Tournament.class).id(tournamentId).now();
     }
@@ -144,13 +137,13 @@ public class MatchPlayScorer
     // Add match method, for an existing tournament
     @ApiMethod(
             name = "mpscorerapi.addMatch",
-            path = MATCH_LIST_URI,
+            path = URIs.MATCH_LIST_URI,
             httpMethod = HttpMethod.POST
 //            scopes = {"s0", "s1"},
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public TournamentPOJO addMatch(@Named(TOURNAMENT_ID_PARAM) final Long tournamentId, final Match newMatch) throws BadRequestException, NotFoundException
+    public TournamentPOJO addMatch(@Named(URIs.TOURNAMENT_ID_PARAM) final Long tournamentId, final Match newMatch) throws BadRequestException, NotFoundException
     {
         // check data integrity
         if ( !newMatch.validateAsNewObject() )
@@ -183,13 +176,13 @@ public class MatchPlayScorer
     //This just gets a single match, results included
     @ApiMethod(
             name = "mpscorerapi.getMatch",
-            path = MATCH_URI,                  // http://server/tournament/1/match/2
+            path = URIs.MATCH_URI,                  // http://server/tournament/1/match/2
             httpMethod = HttpMethod.GET
 //            scopes = {"s0", "s1"},
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public Match getMatch(@Named(TOURNAMENT_ID_PARAM) final Long tournamentId, @Named(MATCH_ID_PARAM) Long matchId) throws NotFoundException
+    public Match getMatch(@Named(URIs.TOURNAMENT_ID_PARAM) final Long tournamentId, @Named(URIs.MATCH_ID_PARAM) Long matchId) throws NotFoundException
     {
         Match match =  ofy().load().type(Match.class).id(matchId).now();
         if (match==null)
@@ -202,13 +195,13 @@ public class MatchPlayScorer
     //This deletes a Match and all its reference keys in the tournament
     @ApiMethod(
             name = "mpscorerapi.deleteMatch",
-            path = MATCH_URI,                  // http://server/tournament/1/match/2
+            path = URIs.MATCH_URI,                  // http://server/tournament/1/match/2
             httpMethod = HttpMethod.DELETE
 //            scopes = {"s0", "s1"},
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public TournamentPOJO deleteMatch(@Named(TOURNAMENT_ID_PARAM) final Long tournamentId, @Named(MATCH_ID_PARAM) final Long matchId) throws NotFoundException
+    public TournamentPOJO deleteMatch(@Named(URIs.TOURNAMENT_ID_PARAM) final Long tournamentId, @Named(URIs.MATCH_ID_PARAM) final Long matchId) throws NotFoundException
     {
         // will make a few writes, so let's use a transaction for data integrity
         Tournament th = ofy().transact(new Work<Tournament>()
@@ -248,13 +241,13 @@ public class MatchPlayScorer
     // Updates the match data
     @ApiMethod(
             name = "mpscorerapi.updateMatch",
-            path = MATCH_URI,           // http://server/tournament/1/match/2
+            path = URIs.MATCH_URI,           // http://server/tournament/1/match/2
             httpMethod = HttpMethod.POST
 //            scopes = {"s0", "s1"},
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public Match updateMatch(@Named(TOURNAMENT_ID_PARAM) Long tournamentId, @Named(MATCH_ID_PARAM) Long matchId, Match newData) throws BadRequestException, NotFoundException
+    public Match updateMatch(@Named(URIs.TOURNAMENT_ID_PARAM) Long tournamentId, @Named(URIs.MATCH_ID_PARAM) Long matchId, Match newData) throws BadRequestException, NotFoundException
     {
         Match match = ofy().load().type(Match.class).id(matchId).now();
         if (match==null)
@@ -282,14 +275,14 @@ public class MatchPlayScorer
     @ApiMethod(
             name = "mpscorerapi.getTournamentNoResults",
 
-            path = TOURNAMENT_URI + "/noresults",     // http://server/tournament/1/noresults/
+            path = URIs.TOURNAMENT_URI + "/noresults",     // http://server/tournament/1/noresults/
             httpMethod = HttpMethod.GET,
             cacheControl = @ApiMethodCacheControl(noCache = false, maxAge = 24*3600 )
 //            scopes = {"s0", "s1"},
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public TournamentPOJO getTournamentNoResults(@Named(TOURNAMENT_ID_PARAM) Long tournamentId) throws NotFoundException
+    public TournamentPOJO getTournamentNoResults(@Named(URIs.TOURNAMENT_ID_PARAM) Long tournamentId) throws NotFoundException
     {
         Tournament tournament =  ofy().load().type(Tournament.class).id(tournamentId).now();
         if (tournament==null)
@@ -303,7 +296,7 @@ public class MatchPlayScorer
             match.setHole(null);
             match.setResult(null);
             match.setTimestamp(null);
-            match.setResultURI(TOURNAMENT_LIST_URI + "/" + tournamentId.toString() + "/result/" + match.getId().toString());
+            match.setResultURI(URIs.TOURNAMENT_LIST_URI + "/" + tournamentId.toString() + "/result/" + match.getId().toString());
         }
         return tournament;
     }
@@ -312,13 +305,13 @@ public class MatchPlayScorer
     //This just gets all matches results, to avoid wasted bandwidth in player names etc.
     @ApiMethod(
             name = "mpscorerapi.getAllResults",
-            path = RESULT_LIST_URI,  // http://server/tournament/1/result/
+            path = URIs.RESULT_LIST_URI,  // http://server/tournament/1/result/
             httpMethod = HttpMethod.GET
 //            scopes = {"s0", "s1"},
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public List<SimpleResult> getAllResults(@Named(TOURNAMENT_ID_PARAM) Long tournamentId) throws NotFoundException
+    public List<SimpleResult> getAllResults(@Named(URIs.TOURNAMENT_ID_PARAM) Long tournamentId) throws NotFoundException
     {
         Tournament tournament =  ofy().load().type(Tournament.class).id(tournamentId).now();
         if (tournament==null)
@@ -341,13 +334,13 @@ public class MatchPlayScorer
     //This just gets one matches result, to avoid wasted bandwidth in player names etc.
     @ApiMethod(
             name = "mpscorerapi.getMatchResult",
-            path = RESULT_URI, // http://server/tournament/1/result/2
+            path = URIs.RESULT_URI, // http://server/tournament/1/result/2
             httpMethod = HttpMethod.GET
 //            scopes = {"s0", "s1"},
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public SimpleResult getMatchResult(@Named(TOURNAMENT_ID_PARAM) Long tournamentId, @Named(MATCH_ID_PARAM) Long matchId) throws NotFoundException
+    public SimpleResult getMatchResult(@Named(URIs.TOURNAMENT_ID_PARAM) Long tournamentId, @Named(URIs.MATCH_ID_PARAM) Long matchId) throws NotFoundException
     {
         Match match = ofy().load().type(Match.class).id(matchId).now();
         if (match==null)
@@ -361,13 +354,13 @@ public class MatchPlayScorer
     // so we do not return anything to save bandwidth. Match ID in the payload and Timestamp are ignored if sent by the client.
     @ApiMethod(
             name = "mpscorerapi.updateMatchResult",
-            path = RESULT_URI,
+            path = URIs.RESULT_URI,
             httpMethod = HttpMethod.POST
 //            scopes = {"s0", "s1"},
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public void updateMatchResult(@Named(TOURNAMENT_ID_PARAM) Long tournamentId, @Named(MATCH_ID_PARAM) Long matchId, SimpleResult newData) throws BadRequestException, NotFoundException
+    public void updateMatchResult(@Named(URIs.TOURNAMENT_ID_PARAM) Long tournamentId, @Named(URIs.MATCH_ID_PARAM) Long matchId, SimpleResult newData) throws BadRequestException, NotFoundException
     {
         try
         {
@@ -390,9 +383,13 @@ public class MatchPlayScorer
 
             ofy().save().entity(match).now();
         }
+
+        pushResultsToClients(tournamentId);
     }
 
-
+    private void pushResultsToClients(Long tournamentId) throws NotFoundException
+    {
+        Gson gson = new Gson();
+        PushSrv.sendUpdateToClients(tournamentId, gson.toJson(getAllResults(tournamentId)));
+    }
 }
-
-

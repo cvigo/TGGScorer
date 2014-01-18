@@ -16,6 +16,7 @@ public class Match
     @Id private Long id;
     //@Parent Key<Tournament> tournamentKey;
     private String rightPlayer;
+    private String leftPlayer;
 
     private Date startTime;
     private Integer orderInGroup; // typically 0 or 1, as one group = 2 individual matches
@@ -54,7 +55,6 @@ public class Match
 //    {
 //        this.tournamentKey = tournamentKey;
 //    }
-    private String leftPlayer;
 
     public void setResult(Integer result)
     {

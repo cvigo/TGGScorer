@@ -394,11 +394,7 @@ appModule.controller("MainCtrl",
     {
         $scope.loadTournament($routeParams.tournamentID);
 
-        for (m in $scope.tournamentDataSrv.matches)
-        {
-            $scope.matchUpdateControl.push(false);
-
-        }
+        $scope.
     }
 
 
