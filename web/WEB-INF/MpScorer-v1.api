@@ -239,6 +239,27 @@
         "body" : "autoTemplate(backendResponse)"
       }
     },
+    "mpscorer.mpscorerapi.updateTournament" : {
+      "path" : "tournament/{tournamentId}",
+      "httpMethod" : "POST",
+      "scopes" : [ ],
+      "audiences" : [ ],
+      "clientIds" : [ ],
+      "rosyMethod" : "com.galaxiagolf.matchplay.MatchPlayScorer.updateTournament",
+      "request" : {
+        "parameters" : {
+          "tournamentId" : {
+            "type" : "int64",
+            "required" : true
+          }
+        },
+        "body" : "autoTemplate(backendRequest)",
+        "bodyName" : "resource"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
     "mpscorer.mpscorerapi.getMatch" : {
       "path" : "tournament/{tournamentId}/match/{matchId}",
       "httpMethod" : "GET",
@@ -258,27 +279,6 @@
           }
         },
         "body" : "empty"
-      },
-      "response" : {
-        "body" : "autoTemplate(backendResponse)"
-      }
-    },
-    "mpscorer.mpscorerapi.updateTournament" : {
-      "path" : "tournament/{tournamentId}",
-      "httpMethod" : "POST",
-      "scopes" : [ ],
-      "audiences" : [ ],
-      "clientIds" : [ ],
-      "rosyMethod" : "com.galaxiagolf.matchplay.MatchPlayScorer.updateTournament",
-      "request" : {
-        "parameters" : {
-          "tournamentId" : {
-            "type" : "int64",
-            "required" : true
-          }
-        },
-        "body" : "autoTemplate(backendRequest)",
-        "bodyName" : "resource"
       },
       "response" : {
         "body" : "autoTemplate(backendResponse)"
@@ -429,17 +429,17 @@
           "$ref" : "Match"
         }
       },
-      "com.galaxiagolf.matchplay.MatchPlayScorer.getMatch" : {
-        "response" : {
-          "$ref" : "Match"
-        }
-      },
       "com.galaxiagolf.matchplay.MatchPlayScorer.updateTournament" : {
         "request" : {
           "$ref" : "TournamentPOJO"
         },
         "response" : {
           "$ref" : "TournamentPOJO"
+        }
+      },
+      "com.galaxiagolf.matchplay.MatchPlayScorer.getMatch" : {
+        "response" : {
+          "$ref" : "Match"
         }
       }
     }
