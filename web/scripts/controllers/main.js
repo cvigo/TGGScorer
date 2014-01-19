@@ -36,6 +36,7 @@ appModule.controller("MainCtrl",
     $scope.resultsSrv = []; // this will store de results received from the server
     $scope.playerList = []; // this feeds the players filter in the model
     $scope.groups = [];
+    $scope.refreshing = "null";
 
 /*    $scope.groups = [
         {
@@ -212,9 +213,12 @@ appModule.controller("MainCtrl",
  */
     $scope.reloadResults = function()
     {
+        $scope.refreshing = "rotating"; // this applies "rotating" class to the refresh button
+
         Result.get({tournamentID:$routeParams.tournamentID},
             function(resultsArray)  // success callback
             {
+                $scope.refreshing = "null";
                 angular.forEach(resultsArray.items, function (result, index)
                 {
                     //we can trust TS, as the server does not write POSTs that do not actually send a different hole or result than the ones already stored
@@ -238,8 +242,10 @@ appModule.controller("MainCtrl",
             },
             function(errMsg) //error callback
             {
+                $scope.refreshing = "null";
                 $scope.displayAlertMessage("danger", errMsg.data.error.message, 0);
             }
+
         );
     }
 
@@ -393,8 +399,6 @@ appModule.controller("MainCtrl",
     $scope.initModel = function()
     {
         $scope.loadTournament($routeParams.tournamentID);
-
-        $scope.
     }
 
 
