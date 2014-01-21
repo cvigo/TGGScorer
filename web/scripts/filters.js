@@ -34,7 +34,7 @@ angularFilters.filter('prettyhole', function()
         var remaining = 18-inputMatch.result.h;
 
         if ( remaining == 0 || absResult > remaining  )
-            return "Finalizado";
+            return "Finalizado (" + inputMatch.result.h + ")";
         else
             return "Hoyo "+ inputMatch.result.h;
     }
