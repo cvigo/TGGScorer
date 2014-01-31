@@ -28,17 +28,17 @@
 
 .team-color-animation.Bucaneros-add
 {
-    -webkit-animation:1s Bucaneros-on;
-    -moz-animation:1s Bucaneros-on;
-    -o-animation:1s Bucaneros-on;
-    animation:1s Bucaneros-on;
+    -webkit-animation:1.0s Bucaneros-on;
+    -moz-animation:1.0s Bucaneros-on;
+    -o-animation:1.0s Bucaneros-on;
+    animation:1.0s Bucaneros-on;
 }
 .team-color-animation.Bucaneros-remove
 {
-    -webkit-animation:1s Bucaneros-off;
-    -moz-animation:1s Bucaneros-off;
-    -o-animation:1s Bucaneros-off;
-    animation:1s Bucaneros-off;
+    -webkit-animation:1.0s Bucaneros-off;
+    -moz-animation:1.0s Bucaneros-off;
+    -o-animation:1.0s Bucaneros-off;
+    animation:1.0s Bucaneros-off;
 }
 
 @-webkit-keyframes Bucaneros-on
@@ -78,18 +78,18 @@
 
 .team-color-animation.Corsarios-add
 {
-    -webkit-animation:0.5s Corsarios-on;
-    -moz-animation:0.5s Corsarios-on;
-    -o-animation:0.5s Corsarios-on;
-    animation:0.5s Corsarios-on;
+    -webkit-animation:1.0s Corsarios-on;
+    -moz-animation:1.0s Corsarios-on;
+    -o-animation:1.0s Corsarios-on;
+    animation:1.0s Corsarios-on;
 }
 
 .team-color-animation.Corsarios-remove
 {
-    -webkit-animation:0.5s Corsarios-off;
-    -moz-animation:0.5s Corsarios-off;
-    -o-animation:0.5s Corsarios-off;
-    animation:0.5s Corsarios-off;
+    -webkit-animation:1.0s Corsarios-off;
+    -moz-animation:1.0s Corsarios-off;
+    -o-animation:1.0s Corsarios-off;
+    animation:1.0s Corsarios-off;
 }
 
 @keyframes Corsarios-on {
@@ -126,18 +126,18 @@
 }
 .team-color-animation.Filibusteros-add
 {
-    -webkit-animation:0.5s Filibusteros-on;
-    -moz-animation:0.5s Filibusteros-on;
-    -o-animation:0.5s Filibusteros-on;
-    animation:0.5s Filibusteros-on;
+    -webkit-animation:1.0s Filibusteros-on;
+    -moz-animation:1.0s Filibusteros-on;
+    -o-animation:1.0s Filibusteros-on;
+    animation:1.0s Filibusteros-on;
 }
 
 .team-color-animation.Filibusteros-remove
 {
-    -webkit-animation:0.5s Filibusteros-off;
-    -moz-animation:0.5s Filibusteros-off;
-    -o-animation:0.5s Filibusteros-off;
-    animation:0.5s Filibusteros-off;
+    -webkit-animation:1.0s Filibusteros-off;
+    -moz-animation:1.0s Filibusteros-off;
+    -o-animation:1.0s Filibusteros-off;
+    animation:1.0s Filibusteros-off;
 }
 
 @keyframes Filibusteros-on
@@ -177,18 +177,18 @@
 
 .team-color-animation.Cosacos-add
 {
-    -webkit-animation:0.5s Cosacos-on;
-    -moz-animation:0.5s Cosacos-on;
-    -o-animation:0.5s Cosacos-on;
-    animation:0.5s Cosacos-on;
+    -webkit-animation:1.0s Cosacos-on;
+    -moz-animation:1.0s Cosacos-on;
+    -o-animation:1.0s Cosacos-on;
+    animation:1.0s Cosacos-on;
 }
 
 .team-color-animation.Cosacos-remove
 {
-    -webkit-animation:0.5s Cosacos-off;
-    -moz-animation:0.5s Cosacos-off;
-    -o-animation:0.5s Cosacos-off;
-    animation:0.5s Cosacos-off;
+    -webkit-animation:1.0s Cosacos-off;
+    -moz-animation:1.0s Cosacos-off;
+    -o-animation:1.0s Cosacos-off;
+    animation:1.0s Cosacos-off;
 }
 
 @keyframes Cosacos-on {
@@ -208,6 +208,103 @@
     from
     {
         background-color: #ffffff;
+        color: #000000;
+    }
+    to
+    {
+        background-color: #f8f8f8;
+        color: #000000;
+    }
+}
+
+
+.Equipo-A
+{
+    background-color: #ffb3d4;
+    color: #000000;
+}
+
+.team-color-animation.Equipo-A-add
+{
+    -webkit-animation:1.0s Equipo-A-on;
+    -moz-animation:1.0s Equipo-A-on;
+    -o-animation:1.0s Equipo-A-on;
+    animation:1.0s Equipo-A-on;
+}
+
+.team-color-animation.Equipo-A-remove
+{
+    -webkit-animation:1.0s Equipo-A-off;
+    -moz-animation:1.0s Equipo-A-off;
+    -o-animation:1.0s Equipo-A-off;
+    animation:1.0s Equipo-A-off;
+}
+
+@keyframes Equipo-A-on {
+    from
+    {
+        background-color: #f8f8f8;
+        color: #000000;
+    }
+    to
+    {
+        background-color: #ffb3d4;
+        color: #000000;
+    }
+}
+
+@keyframes Equipo-A-off {
+    from
+    {
+        background-color: #ffb3d4;
+        color: #000000;
+    }
+    to
+    {
+        background-color: #f8f8f8;
+        color: #000000;
+    }
+}
+
+.Equipo-B
+{
+    background-color: #fffe12;
+    color: #000000;
+}
+
+.team-color-animation.Equipo-B-add
+{
+    -webkit-animation:1.0s Equipo-B-on;
+    -moz-animation:1.0s Equipo-B-on;
+    -o-animation:1.0s Equipo-B-on;
+    animation:1.0s Equipo-B-on;
+}
+
+.team-color-animation.Equipo-B-remove
+{
+    -webkit-animation:1.0s Equipo-B-off;
+    -moz-animation:1.0s Equipo-B-off;
+    -o-animation:1.0s Equipo-B-off;
+    animation:1.0s Equipo-B-off;
+}
+
+@keyframes Equipo-B-on {
+    from
+    {
+        background-color: #f8f8f8;
+        color: #000000;
+    }
+    to
+    {
+        background-color: #fffe12;
+        color: #000000;
+    }
+}
+
+@keyframes Equipo-B-off {
+    from
+    {
+        background-color: #fffe12;
         color: #000000;
     }
     to

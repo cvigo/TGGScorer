@@ -5,15 +5,16 @@
 
 <project name="appengine-endpoints generator for TGGScorer" default="generate-endpoints-api">
 
-    <!-- AppEngine stuff -->
-    <property name="sdk.dir" location="${basedir}/../../appengine-java-sdk-1.8.0/" />
     <import file="${basedir}/../../cvTools/endpoints.sh.ant.xml" />
 
-    <property name="source-war" value="${basedir}/../../../../IdeaProjects/TGGScorer/out/artifacts/TGGScorer_war_exploded"/>
+    <property name="out-dir" value="${basedir}/../../../../developer/IdeaProjectsOut"/>
+
+    <property name="source-war" value="${out-dir}/TGGScorer/out/artifacts/TGGScorer_war_exploded"/>
     <property name="outputdir" value="${source-war}/WEB-INF"/>
     <property name="outputdir2" value="${basedir}/web/WEB-INF"/>
 
 
+    <!-- AppEngine stuff -->
     <property name="sdk.dir" location="${basedir}/../../appengine-java-sdk-1.8.0/" />
     <property name="sdk.lib" location="${basedir}/lib" />
 
