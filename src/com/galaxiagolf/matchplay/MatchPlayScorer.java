@@ -164,7 +164,7 @@ public class MatchPlayScorer
                 Tournament theTournament = ofy().load().group(Tournament.NoResults.class).type(Tournament.class).id(tournamentId).now();
                 if (theTournament == null)
                 {
-                    ofy().getTransaction().rollback();
+                    //ofy().getTransaction().rollback();
                     return null;
                 }
                 Key<Match> matchKey = ofy().save().entity(newMatch).now();
