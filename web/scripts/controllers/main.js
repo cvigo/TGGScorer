@@ -222,7 +222,8 @@ appModule.controller("MainCtrl",
                 angular.forEach(resultsArray.items, function (result, index)
                 {
                     //we can trust TS, as the server does not write POSTs that do not actually send a different hole or result than the ones already stored
-                    if ($scope.resultsSrv[index].ts < result.ts) //TS
+                    // this if is just used to trigger or not trigger the annimations in the scorer screen. Results are always reloaded
+                    if ( ($scope.resultsSrv[index].ts == null && result.ts != null) || $scope.resultsSrv[index].ts < result.ts) //TS
                     {
                         $scope.markAsChanged($scope.resultsSrv[index].id);
 
@@ -236,6 +237,13 @@ appModule.controller("MainCtrl",
                                  },
                                  2000
                         );
+                    }
+                    else
+                    {
+                        // Results are always reloaded regardless of the timestamps
+                        $scope.resultsSrv[index].r = result.r;
+                        $scope.resultsSrv[index].h = result.h;
+                        $scope.resultsSrv[index].ts = result.ts;
                     }
 
                 });
