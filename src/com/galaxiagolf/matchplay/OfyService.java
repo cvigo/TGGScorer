@@ -1,6 +1,6 @@
 package com.galaxiagolf.matchplay;
 
-import com.galaxiagolf.entity.Channel;
+import com.galaxiagolf.matchplay.entity.Channel;
 import com.galaxiagolf.matchplay.entity.Match;
 import com.galaxiagolf.matchplay.entity.Tournament;
 import com.googlecode.objectify.Objectify;

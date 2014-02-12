@@ -20,6 +20,7 @@ appModule.controller("MainCtrl",
                          "$timeout",
                          "$animate",
                          "TournamentMin",
+                         "TournamentFull",
                          "Result",
                          function (
                              $scope,
@@ -28,6 +29,7 @@ appModule.controller("MainCtrl",
                              $timeout,
                              $animate,
                              TournamentMin,
+                             TournamentFull,
                              Result
                          )
 {
@@ -79,7 +81,6 @@ appModule.controller("MainCtrl",
     $scope.leftColor = "";
 
     // template control properties
-    $scope.oneAtATime = false;  //
     $scope.lastMessage = {type:"success", text:MsgText.WORKING};
 
 
@@ -177,7 +178,7 @@ appModule.controller("MainCtrl",
                                for (match in $scope.tournamentDataSrv.matches)
                                {
                                    //store the reference to the result, so futures updates to the results object are automatically loaded into the template
-                                   $scope.tournamentDataSrv.matches[match].value.result = $scope.resultsSrv[match];
+                                   $scope.tournamentDataSrv.matches[match].result = $scope.resultsSrv[match];
                                }
                                $scope.createGroups();
                            },
@@ -349,7 +350,7 @@ appModule.controller("MainCtrl",
 
         for (matchid in $scope.tournamentDataSrv.matches)
         {
-            var match = $scope.tournamentDataSrv.matches[matchid].value;
+            var match = $scope.tournamentDataSrv.matches[matchid];
 
             if (match.startTime > lastStartTime) // is is a new group
             {
@@ -379,15 +380,15 @@ appModule.controller("MainCtrl",
     {
         $scope.tournamentDataSrv.matches.sort(function(a, b)
                             {
-                                if (a.value.startTime < b.value.startTime)
+                                if (a.startTime < b.startTime)
                                     return -1;
-                                else if (a.value.startTime > b.value.startTime)
+                                else if (a.startTime > b.startTime)
                                     return 1;
                                 else
                                 {
-                                    if (a.value.orderInGroup < b.value.orderInGroup)
+                                    if (a.orderInGroup < b.orderInGroup)
                                         return -1;
-                                    else if (a.value.orderInGroup > b.value.orderInGroup)
+                                    else if (a.orderInGroup > b.orderInGroup)
                                         return 1;
                                     else
                                         return 0;
@@ -423,8 +424,8 @@ appModule.controller("MainCtrl",
         var match;
         for (match in $scope.tournamentDataSrv.matches)
         {
-            $scope.playerList.push($scope.tournamentDataSrv.matches[match].value.leftPlayer);
-            $scope.playerList.push($scope.tournamentDataSrv.matches[match].value.rightPlayer);
+            $scope.playerList.push($scope.tournamentDataSrv.matches[match].leftPlayer);
+            $scope.playerList.push($scope.tournamentDataSrv.matches[match].rightPlayer);
         }
 
         $('input.typeahead-players').typeahead({
@@ -660,5 +661,52 @@ appModule.controller("MainCtrl",
             $scope.alertTimeout = $timeout(function(){$scope.alertVisible = false;}, timeOut);
     }
 
-  }]);
+    /**
+     * @ngdoc function
+     * @name $scope.searchTournament
+     * @function
+     *
+     * @param {passKey} the passkey to be used as search param
+     * @description
+     * Searches a tournament by passkey. If succeeds, opens the player view screen
+     *
+     */
+    $scope.searchTournament = function(passKey)
+    {
+        $("#btn-send").button("loading");
+
+        TournamentFull.get({tournamentID:$routeParams.tournamentID, passKey:passKey},
+                       function(reply) // success callback
+                       {
+                           $("#btn-send").button("found");
+                           window.location = '#/playerView/' + reply.id;
+                       },
+                       function(errMsg) //error callback
+                       {
+                           $("#btn-send").button("error");
+                           $scope.displayAlertMessage("danger", errMsg.data.error.message, 0);
+                           $timeout(function () {$("#btn-send").button("reset")}, 2000);
+                       }
+        );
+    }
+
+    /**
+     * @ngdoc function
+     * @name $scope.passkeyChange
+     * @param {passKey} the passkey typed
+     * @function
+     *
+     * @description
+     * Searches a tournament by passkey. If succeeds, opens the player view screen
+     *
+     */
+    $scope.passkeyChange = function(passKey)
+    {
+        $scope.alertVisible = false;
+        $scope.searchTournamentEnabled = passKey.length > 3;
+        $("#btn-send").button("reset");
+
+    }
+
+}]);
 

@@ -15,7 +15,8 @@ var appScorer = angular.module("Scorer", ["MainViewModule", "ngRoute", "ngTouch"
       })
       .otherwise(
       {
-        redirectTo: "/playerView"
+          templateUrl: "views/tournament_selection.html",
+          controller: "MainCtrl"
       });
   });
 

@@ -15,7 +15,7 @@
 
 
     <!-- AppEngine stuff -->
-    <property name="sdk.dir" location="${basedir}/../../appengine-java-sdk-1.8.0/" />
+    <property name="sdk.dir" location="${basedir}/../../appengine-java-sdk-1.8.9/" />
     <property name="sdk.lib" location="${basedir}/lib" />
 
 
@@ -24,11 +24,10 @@
         <generate-endpoints command="gen-api-config" class="com.galaxiagolf.matchplay.MatchPlayScorer">
             <options>
                 <arg value="--war=${source-war}" />
-                <arg value="--classpath=${source-war}/WEB-INF/classes:${source-war}/WEB-INF/lib/objectify-4.0rc1.jar" />
+                <arg value="--classpath=${source-war}/WEB-INF/classes:${source-war}/WEB-INF/lib/objectify-4.0rc2.jar" />
                 <arg value="--output=${outputdir2}" />
             </options>
         </generate-endpoints>
-
     </target>
 
     <target name="generate-endpoints-client-lib" description="Generate Google Endpoints API file">
@@ -36,11 +35,10 @@
             <options>
                 <arg value="--war=${source-war}" />
                 <arg value="--language=java" />
-                <arg value="--classpath=${source-war}/WEB-INF/classes:${source-war}/WEB-INF/lib/objectify-4.0rc1.jar" />
-                <arg value="--output=/Users/carlosvigo/IdeaProjects/TGGScorer/endpoints_out" />
+                <arg value="--classpath=${source-war}/WEB-INF/classes:${source-war}/WEB-INF/lib/objectify-4.0rc2.jar" />
+                <arg value="--output=${out-dir}/TGGScorer/endpoints_out" />
             </options>
         </generate-endpoints>
-
     </target>
 
     <target name="generate-endpoints-discovery-docs" description="Generate Google Endpoints API file" depends="generate-endpoints-api">
@@ -50,7 +48,6 @@
                 <arg value="--output=${outputdir}" />
             </options>
         </generate-endpoints>
-
     </target>
 
 </project>

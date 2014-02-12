@@ -159,5 +159,17 @@ public class Match
         this.resultURI = resultURI;
     }
 
+    public void updateFrom(Match newData)
+    {
+        if (newData.getLeftPlayer() != null && !newData.getLeftPlayer().isEmpty()) setLeftPlayer(newData.getLeftPlayer());
+        if (newData.getRightPlayer() != null && !newData.getRightPlayer().isEmpty()) setRightPlayer(newData.getRightPlayer());
+        if (newData.getStartTime() != null) setStartTime(newData.getStartTime());
+        if (newData.getOrderInGroup() != null) setOrderInGroup(newData.getOrderInGroup());
+        if (newData.getHole() != null) setHole(newData.getHole());
+        if (newData.getResult() != null) setResult(newData.getResult());
+        setTimestamp(new Date());
+
+    }
+
 
 }

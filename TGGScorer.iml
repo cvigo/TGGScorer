@@ -16,12 +16,12 @@
     </facet>
     <facet type="google-app-engine" name="Google App Engine">
       <configuration>
-        <sdk-home-path>$MODULE_DIR$/../../appengine-java-sdk-1.8.0</sdk-home-path>
+        <sdk-home-path>$MODULE_DIR$/../../appengine-java-sdk-1.8.9</sdk-home-path>
         <run-enhancer-on-make>true</run-enhancer-on-make>
         <files-to-enhance>
           <file path="$MODULE_DIR$/src" />
         </files-to-enhance>
-        <persistence-api>JDO3</persistence-api>
+        <persistence-api>JPA2</persistence-api>
       </configuration>
     </facet>
   </component>
@@ -34,12 +34,13 @@
       <excludeFolder url="file://$MODULE_DIR$/__artifacts_temp" />
       <excludeFolder url="file://$MODULE_DIR$/node_modules" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Java SDK 1.7" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="PROVIDED" name="sass-stdlib" level="application" />
+    <orderEntry type="library" name="com.google.appengine:appengine-endpoints:1.8.9" level="project" />
     <orderEntry type="library" name="com.googlecode.objectify:objectify:4.0rc1" level="project" />
-    <orderEntry type="library" name="GAE_Libs" level="project" />
-    <orderEntry type="library" name="gson-2.2.4" level="project" />
+    <orderEntry type="library" name="com.google.appengine:appengine-endpoints-deps:1.8.9" level="project" />
+    <orderEntry type="library" name="com.google.code.gson:gson:2.2.4" level="project" />
   </component>
 </module>
 

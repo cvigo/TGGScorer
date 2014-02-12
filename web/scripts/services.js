@@ -25,6 +25,13 @@ serverModule.factory("TournamentMin", function($resource)
 
 });
 
+serverModule.factory("Tournaments", function($resource)
+{
+    return $resource(_API_PATH + "/" + _API_VERSION + "/tournament/",
+              {tournamentID:"@id"});
+
+});
+
 serverModule.factory("Result", function($resource)
 {
     return $resource(_API_PATH + "/" + _API_VERSION + "/tournament/:tournamentID/result/:matchId",
