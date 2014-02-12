@@ -1,0 +1,25 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" build-on-make="true" name="TGGScorer:war exploded">
+    <output-path>$USER_HOME$/developer/IdeaProjectsOut/TGGScorer/out/artifacts/TGGScorer_war_exploded</output-path>
+    <properties id="ant-postprocessing">
+      <options enabled="true">
+        <file>file://$PROJECT_DIR$/tggscorer-endpoints.xml</file>
+        <target>generate-endpoints-api</target>
+      </options>
+    </properties>
+    <root id="root">
+      <element id="javaee-facet-resources" facet="TGGScorer/web/Web" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="TGGScorer" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="com.google.appengine:appengine-endpoints:1.8.9" />
+          <element id="library" level="project" name="com.googlecode.objectify:objectify:4.0rc1" />
+          <element id="library" level="project" name="com.google.appengine:appengine-endpoints-deps:1.8.9" />
+          <element id="library" level="project" name="com.google.code.gson:gson:2.2.4" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>

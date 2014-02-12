@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="AppEngine Dev JavaScript" type="JavascriptDebugType" factoryName="JavaScript Debug" singleton="true" uri="http://localhost:8080/#/playerView/1">
+    <mapping url="http://localhost:8080/scripts/controllers/main.js" local-file="$USER_HOME$/developer/IdeaProjectsOut/TGGScorer/out/artifacts/TGGScorer_war_exploded/scripts/controllers/main.js" />
+    <mapping url="http://localhost:8080/scripts/controllers/main.js" local-file="$PROJECT_DIR$/web/scripts/controllers/main.js" />
+    <mapping url="http://localhost:8080" local-file="$PROJECT_DIR$/web" />
+    <RunnerSettings RunnerId="JavascriptDebugRunner" />
+    <ConfigurationWrapper RunnerId="JavascriptDebugRunner" />
+    <method>
+      <option name="BuildArtifacts" enabled="true">
+        <artifact name="TGGScorer:war exploded" />
+      </option>
+    </method>
+  </configuration>
+</component>

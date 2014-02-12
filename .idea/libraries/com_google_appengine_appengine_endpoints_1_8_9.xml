@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="com.google.appengine:appengine-endpoints:1.8.9" type="repository">
+    <properties maven-id="com.google.appengine:appengine-endpoints:1.8.9" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/appengine/appengine-endpoints/1.8.9/appengine-endpoints-1.8.9.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/appengine/appengine-api-1.0-sdk/1.8.9/appengine-api-1.0-sdk-1.8.9.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
