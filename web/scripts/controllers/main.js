@@ -703,8 +703,8 @@ appModule.controller("MainCtrl",
     $scope.passkeyChange = function(passKey)
     {
         $scope.alertVisible = false;
+        //$("#btn-send").button("reset");
         $scope.searchTournamentEnabled = passKey.length > 3;
-        $("#btn-send").button("reset");
 
     }
 
