@@ -73,6 +73,12 @@ public class Tournament
         this.passKey = passKey;
     }
 
+    public Tournament clean()
+    {
+        this.setPassKey(null);
+        return this;
+    }
+
     //Inner classes for partial loads
     public static class NoResults{}
 
@@ -84,7 +90,9 @@ public class Tournament
                         this.getLeftTeamName() != null &&
                         ! this.getLeftTeamName().isEmpty() &&
                         this.getRightTeamName() != null &&
-                        ! this.getRightTeamName().isEmpty()
+                        ! this.getRightTeamName().isEmpty() &&
+                        this.getPassKey() != null &&
+                        this.getPassKey().length() > 3
         );
     }
 
@@ -126,7 +134,7 @@ public class Tournament
         {
             Ref<Match> m = it.next();
             if ( m.isLoaded() )
-                ret.add(m.getValue());
+                ret.add(m.getValue().clean());
         }
 
         return ret;

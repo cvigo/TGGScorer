@@ -11,7 +11,7 @@ var MsgText =
 var alertTimeout = 3000;
 
 
-var appModule = angular.module("MainViewModule", ["BackendModule", "ScorerFilters"]);
+var appModule = angular.module("MainViewModule", ["BackendModule", "ScorerFilters", "ngCookies"]);
 
 appModule.controller("MainCtrl",
                      ["$scope",
@@ -19,6 +19,8 @@ appModule.controller("MainCtrl",
                          "$window",
                          "$timeout",
                          "$animate",
+                         "$cookies",
+                         "$http",
                          "TournamentMin",
                          "TournamentFull",
                          "Result",
@@ -28,6 +30,8 @@ appModule.controller("MainCtrl",
                              $window,
                              $timeout,
                              $animate,
+                             $cookies,
+                             $http,
                              TournamentMin,
                              TournamentFull,
                              Result
@@ -39,6 +43,7 @@ appModule.controller("MainCtrl",
     $scope.playerList = []; // this feeds the players filter in the model
     $scope.groups = [];
     $scope.refreshing = "null";
+    $scope.passKey = "";
 
 /*    $scope.groups = [
         {
@@ -407,6 +412,8 @@ appModule.controller("MainCtrl",
  */
     $scope.initModel = function()
     {
+        $scope.passKey = $cookies.passKey;
+        $scope.setPassKeyHeader();
         $scope.loadTournament($routeParams.tournamentID);
     }
 
@@ -679,6 +686,7 @@ appModule.controller("MainCtrl",
                        function(reply) // success callback
                        {
                            $("#btn-send").button("found");
+                           $cookies.passKey = $scope.passKey;
                            window.location = '#/playerView/' + reply.id;
                        },
                        function(errMsg) //error callback
@@ -706,6 +714,15 @@ appModule.controller("MainCtrl",
         //$("#btn-send").button("reset");
         $scope.searchTournamentEnabled = passKey.length > 3;
 
+    }
+
+    $scope.setPassKeyHeader = function()
+    {
+        var headers  = {"x-PassKey": $scope.passKey};
+        $http.defaults.headers.post = headers;
+        $http.defaults.headers.put = headers;
+        $http.defaults.headers.delete = headers;
+        $http.defaults.headers.patch = headers;
     }
 
 }]);
