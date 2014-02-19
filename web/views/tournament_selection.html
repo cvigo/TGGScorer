@@ -14,11 +14,8 @@
                             <button type="submit" id="btn-send" class="btn btn-primary" ng-disabled="!searchTournamentEnabled" data-loading-text="Buscando..." data-found-text="OK!" data-error-text="ERROR :-(">Enviar</button>
                         </div>
                     </form>
-                    <div class="my-repeat-animation"  ng-show="alertVisible">
-                        <div id="alertPanel" class="alert alert-dismissable alert-{{lastMessage.type}} fade in text-center">
-                            <button type="button" class="close" aria-hidden="true" ng-click="alertVisible=false">×</button>
-                            {{lastMessage.text}}
-                        </div>
+                    <div collapse="!alertVisible">
+                        <alert id="#alertPanel" type="lastMessage.type" close="alertVisible=false">{{lastMessage.text}}</alert>
                     </div>
 
                 </div>

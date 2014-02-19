@@ -1,5 +1,5 @@
 //var appScorer = angular.module("Scorer", ["ui.bootstrap", "MainViewModule"])
-var appScorer = angular.module("Scorer", ["MainViewModule", "ngRoute", "ngTouch", "ngAnimate"]);
+var appScorer = angular.module("Scorer", ["MainViewModule", "ngRoute", "ngTouch", "ngAnimate", "ui.bootstrap"]);
 
 appScorer.config(function ($routeProvider)
   {

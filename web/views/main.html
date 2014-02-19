@@ -23,11 +23,9 @@
                 </div>
             </div>
         </div>
-        <div class="col-xs-12 my-repeat-animation"  ng-show="alertVisible">
-            <div id="#alertPanel" class="alert alert-dismissable alert-{{lastMessage.type}} fade in text-center">
-                <!--<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>-->
-                <button type="button" class="close" aria-hidden="true" ng-click="alertVisible=false">×</button>
-                {{lastMessage.text}}
+        <div class="col-xs-12">
+            <div collapse="!alertVisible">
+                <alert id="#alertPanel" type="lastMessage.type" close="alertVisible=false">{{lastMessage.text}}</alert>
             </div>
         </div>
     </nav>
@@ -86,17 +84,4 @@
             </div>
         </div>
     </div>
-
-    <!--
-    <div class="navbar navbar-default navbar-fixed-bottom" role="navigation">
-        <div class="navbar-inner">
-            <div class="container">
-                <div id="alertPanel" class="alert alert-block fade in">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                    {{lastMessage.text}}
-                </div>
-            </div>
-        </div>
-    </div>
-    -->
 </div>
