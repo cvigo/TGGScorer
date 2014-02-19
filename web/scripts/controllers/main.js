@@ -718,11 +718,10 @@ appModule.controller("MainCtrl",
 
     $scope.setPassKeyHeader = function()
     {
-        var headers  = {"x-PassKey": $scope.passKey};
-        $http.defaults.headers.post = headers;
-        $http.defaults.headers.put = headers;
-        $http.defaults.headers.delete = headers;
-        $http.defaults.headers.patch = headers;
+        $http.defaults.headers.post["x-PassKey"] = $scope.passKey;
+        $http.defaults.headers.put["x-PassKey"] = $scope.passKey;
+        $http.defaults.headers.delete =  {"x-PassKey": $scope.passKey};
+        $http.defaults.headers.patch["x-PassKey"] = $scope.passKey;
     }
 
 }]);

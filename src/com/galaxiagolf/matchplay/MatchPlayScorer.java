@@ -23,6 +23,7 @@ import com.google.api.server.spi.response.BadRequestException;
 import com.google.api.server.spi.response.NotFoundException;
 import com.google.api.server.spi.response.UnauthorizedException;
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.VoidWork;
 import com.googlecode.objectify.Work;
 
@@ -177,8 +178,15 @@ public class MatchPlayScorer
 
                     try{checkAccessToken(req, theTournament);} catch (Exception e){throw new RuntimeException(e);}
 
-                    ofy().delete().entities(theTournament.getMatchKeys());
-                    ofy().delete().type(Tournament.class).id(tournamentId).now();
+                    List<Ref<Match>> matches = theTournament.getMatchKeys();
+
+                    //Datastore transactions are limited to 5 entity groups
+                    if (matches.size() > 4)
+                        ofy().transactionless().delete().entities(matches);
+                    else
+                        ofy().delete().entities(matches);
+
+                    ofy().delete().type(Tournament.class).id(tournamentId);
                 }
             });
     }
