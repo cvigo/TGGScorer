@@ -77,7 +77,8 @@
             "required" : true
           }
         },
-        "body" : "empty"
+        "body" : "autoTemplate(backendRequest)",
+        "bodyName" : "resource"
       },
       "response" : {
         "body" : "empty"
@@ -382,6 +383,9 @@
           },
           "resultURI" : {
             "type" : "string"
+          },
+          "passKey" : {
+            "type" : "string"
           }
         }
       },
@@ -433,6 +437,9 @@
         }
       },
       "com.galaxiagolf.matchplay.MatchPlayScorer.deleteTournament" : {
+        "request" : {
+          "$ref" : "Tournament"
+        }
       },
       "com.galaxiagolf.matchplay.MatchPlayScorer.getAllResults" : {
         "response" : {

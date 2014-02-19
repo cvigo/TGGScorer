@@ -25,6 +25,8 @@ public class Match
     private Date timestamp;
     private String resultURI;
 
+    private String passKey;
+
     @Override public String toString()
     {
         return "Match{" +
@@ -46,15 +48,17 @@ public class Match
         return result;
     }
 
-//    public Key<Tournament> getTournamentKey()
-//    {
-//        return tournamentKey;
-//    }
-//
-//    public void setTournamentKey(Key<Tournament> tournamentKey)
-//    {
-//        this.tournamentKey = tournamentKey;
-//    }
+
+    public String getPassKey()
+    {
+        return passKey;
+    }
+
+    public void setPassKey(String passKey)
+    {
+        this.passKey = passKey;
+    }
+
 
     public void setResult(Integer result)
     {
@@ -169,6 +173,12 @@ public class Match
         if (newData.getResult() != null) setResult(newData.getResult());
         setTimestamp(new Date());
 
+    }
+
+    public Match clean()
+    {
+        this.setPassKey(null);
+        return this;
     }
 
 

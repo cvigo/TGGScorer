@@ -41,6 +41,7 @@
     <orderEntry type="library" name="com.googlecode.objectify:objectify:4.0rc1" level="project" />
     <orderEntry type="library" name="com.google.appengine:appengine-endpoints-deps:1.8.9" level="project" />
     <orderEntry type="library" name="com.google.code.gson:gson:2.2.4" level="project" />
+    <orderEntry type="library" name="javax:javaee-api:7.0" level="project" />
   </component>
 </module>
 

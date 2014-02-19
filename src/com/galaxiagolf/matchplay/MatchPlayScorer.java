@@ -4,6 +4,7 @@ package com.galaxiagolf.matchplay;
 /**
  * Created with IntelliJ IDEA.
  * User: carlosvigo
+ * User: carlosvigo
  * Date: 02/06/13
  * Time: 19:13
  * To change this template use File | Settings | File Templates.
@@ -13,17 +14,22 @@ package com.galaxiagolf.matchplay;
 import com.galaxiagolf.matchplay.entity.Match;
 import com.galaxiagolf.matchplay.entity.SimpleResult;
 import com.galaxiagolf.matchplay.entity.Tournament;
+import com.google.api.server.spi.ServiceException;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiMethod.HttpMethod;
 import com.google.api.server.spi.config.ApiMethodCacheControl;
 import com.google.api.server.spi.response.BadRequestException;
 import com.google.api.server.spi.response.NotFoundException;
+import com.google.api.server.spi.response.UnauthorizedException;
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.Ref;
+import com.googlecode.objectify.VoidWork;
 import com.googlecode.objectify.Work;
 
 import javax.annotation.Nullable;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -94,7 +100,7 @@ public class MatchPlayScorer
         if (tournament==null)
             throw new NotFoundException("tournament not found");
         else
-            return tournament;
+            return tournament.clean();
     }
 
     // Find method for a Tournament. Search criteria supported: passKey only
@@ -112,7 +118,7 @@ public class MatchPlayScorer
         if (tournament==null)
             throw new NotFoundException("tournament not found");
         else
-            return tournament;
+            return tournament.clean();
     }
 
     // Simple update method for a Tournament. It does not update tournament matches, just date and teams
@@ -124,17 +130,30 @@ public class MatchPlayScorer
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public Tournament updateTournament(@Named(TOURNAMENT_ID_PARAM) Long tournamentId, Tournament newData) throws BadRequestException, NotFoundException
+    public Tournament updateTournament(HttpServletRequest req, @Named(TOURNAMENT_ID_PARAM) Long tournamentId, Tournament newData) throws ServiceException
     {
         Tournament theTournament = ofy().load().type(Tournament.class).id(tournamentId).now();
         if (theTournament==null)
             throw new NotFoundException("tournament not found");
+        checkAccessToken(req, theTournament);
 
         // update only the properties passed in the REST call
         theTournament.updateFrom(newData);
 
         ofy().save().entity(theTournament).now();
-        return theTournament;
+        return theTournament.clean();
+    }
+
+    private void checkAccessToken(HttpServletRequest req, Tournament theTournament) throws UnauthorizedException
+    {
+        if ( theTournament.getPassKey() != null && !theTournament.getPassKey().equals(req.getHeader("x-PassKey")) )
+            throw new UnauthorizedException("upps... who are you?");
+    }
+
+    private void checkAccessToken(HttpServletRequest req, Match theMatch) throws UnauthorizedException
+    {
+        if ( theMatch.getPassKey() != null && !theMatch.getPassKey().equals(req.getHeader("x-PassKey")) )
+            throw new UnauthorizedException("upps... who are you?");
     }
 
     // Simple delete method for a Tournament. It does not delete tournament matches, be aware the orphans
@@ -146,25 +165,30 @@ public class MatchPlayScorer
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public void deleteTournament(@Named(TOURNAMENT_ID_PARAM) final Long tournamentId) throws NotFoundException
+    public void deleteTournament(final HttpServletRequest req, @Named(TOURNAMENT_ID_PARAM) final Long tournamentId, Tournament newData) throws ServiceException
     {
-        // will make a few writes, so let's use a transaction for data integrity
-        Tournament th = ofy().transact(new Work<Tournament>()
-        {
-            @Override public Tournament run()
+            // will make a few writes, so let's use a transaction for data integrity
+            ofy().transact(new VoidWork()
             {
-                Tournament theTournament = ofy().load().group(Tournament.NoResults.class).type(Tournament.class).id(tournamentId).now();
-                if (theTournament == null)
-                    return null;
+                @Override public void vrun()
+                {
+                    Tournament theTournament = ofy().load().group(Tournament.NoResults.class).type(Tournament.class).id(tournamentId).now();
+                    if (theTournament == null)
+                        throw new RuntimeException(new NotFoundException("tournament not found"));
 
-                ofy().delete().entities(theTournament.getMatchKeys());
-                ofy().delete().type(Tournament.class).id(tournamentId).now();
-                return theTournament;
-            }
-        });
+                    try{checkAccessToken(req, theTournament);} catch (Exception e){throw new RuntimeException(e);}
 
-        if (th==null)
-            throw new NotFoundException("tournament not found");
+                    List<Ref<Match>> matches = theTournament.getMatchKeys();
+
+                    //Datastore transactions are limited to 5 entity groups
+                    if (matches.size() > 4)
+                        ofy().transactionless().delete().entities(matches);
+                    else
+                        ofy().delete().entities(matches);
+
+                    ofy().delete().type(Tournament.class).id(tournamentId);
+                }
+            });
     }
 
 
@@ -179,14 +203,13 @@ public class MatchPlayScorer
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public Tournament addMatch(@Named(TOURNAMENT_ID_PARAM) final Long tournamentId, final Match newMatch) throws BadRequestException, NotFoundException
+    public Tournament addMatch(final HttpServletRequest req, @Named(TOURNAMENT_ID_PARAM) final Long tournamentId, final Match newMatch) throws ServiceException
     {
         // check data integrity
         if ( !newMatch.validateAsNewObject() )
             throw new BadRequestException("invalid input parameters!" );
 
         newMatch.setTimestamp(new Date());
-
 
         // will make a few writes, so let's use a transaction for data integrity
         Tournament th = ofy().transact(new Work<Tournament>()
@@ -195,21 +218,18 @@ public class MatchPlayScorer
             {
                 Tournament theTournament = ofy().load().group(Tournament.NoResults.class).type(Tournament.class).id(tournamentId).now();
                 if (theTournament == null)
-                {
-                    //ofy().getTransaction().rollback();
-                    return null;
-                }
+                    throw new RuntimeException(new NotFoundException("tournament not found"));
+
+                try{checkAccessToken(req, theTournament);} catch (Exception e){throw new RuntimeException(e);}
+
+                newMatch.setPassKey(theTournament.getPassKey());
                 Key<Match> matchKey = ofy().save().entity(newMatch).now();
                 theTournament.addMatch(matchKey);
                 ofy().save().entity(theTournament).now();
                 return theTournament;
             }
         });
-
-        if (th==null)
-            throw new NotFoundException("tournament not found");
-        else
-            return th;
+        return th.clean();
     }
 
     //This just gets a single match, results included
@@ -221,7 +241,7 @@ public class MatchPlayScorer
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public Match getMatch(@Named(TOURNAMENT_ID_PARAM) final Long tournamentId, @Named(MATCH_ID_PARAM) Long matchId) throws NotFoundException
+    public Match getMatch(@Named(TOURNAMENT_ID_PARAM) final Long tournamentId, @Named(MATCH_ID_PARAM) Long matchId) throws ServiceException
     {
         Match match =  ofy().load().type(Match.class).id(matchId).now();
         if (match==null)
@@ -229,7 +249,7 @@ public class MatchPlayScorer
             throw new NotFoundException("match not found");
         }
 
-        return match;
+        return match.clean();
 
     }
 
@@ -242,7 +262,7 @@ public class MatchPlayScorer
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public void deleteMatch(@Named(TOURNAMENT_ID_PARAM) final Long tournamentId, @Named(MATCH_ID_PARAM) final Long matchId) throws NotFoundException
+    public void deleteMatch(final HttpServletRequest req, @Named(TOURNAMENT_ID_PARAM) final Long tournamentId, @Named(MATCH_ID_PARAM) final Long matchId) throws ServiceException
     {
         // will make a few writes, so let's use a transaction for data integrity
         Tournament th = ofy().transact(new Work<Tournament>()
@@ -251,7 +271,9 @@ public class MatchPlayScorer
             {
                 Tournament theTournament = ofy().load().group(Tournament.NoResults.class).type(Tournament.class).id(tournamentId).now();
                 if (theTournament == null)
-                    return null;
+                    throw new RuntimeException(new NotFoundException("tournament not found"));
+
+                try{checkAccessToken(req, theTournament);} catch (Exception e){throw new RuntimeException(e);}
 
                 if(theTournament.removeMatchRef(matchId))
                 {
@@ -260,12 +282,10 @@ public class MatchPlayScorer
                     return theTournament;
                 }
                 else
-                    return null;
+                    throw new RuntimeException(new NotFoundException("tournament/match not found"));
             }
         });
 
-        if (th==null)
-            throw new NotFoundException("tournament/match not found");
     }
 
     // Updates the match data
@@ -277,16 +297,18 @@ public class MatchPlayScorer
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public Match updateMatch(@Named(TOURNAMENT_ID_PARAM) Long tournamentId, @Named(MATCH_ID_PARAM) Long matchId, Match newData) throws BadRequestException, NotFoundException
+    public Match updateMatch(HttpServletRequest req, @Named(TOURNAMENT_ID_PARAM) Long tournamentId, @Named(MATCH_ID_PARAM) Long matchId, Match newData) throws ServiceException
     {
+
         Match match = ofy().load().type(Match.class).id(matchId).now();
         if (match==null)
             throw new NotFoundException("match not found");
+        checkAccessToken(req, match);
 
         // update only the properties passed in the REST call
         match.updateFrom(newData);
         ofy().save().entity(match).now();
-        return match;
+        return match.clean();
     }
 
 
@@ -305,7 +327,7 @@ public class MatchPlayScorer
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public Tournament getTournamentNoResults(@Named(TOURNAMENT_ID_PARAM) Long tournamentId) throws NotFoundException
+    public Tournament getTournamentNoResults(@Named(TOURNAMENT_ID_PARAM) Long tournamentId) throws ServiceException
     {
         Tournament tournament =  ofy().load().type(Tournament.class).id(tournamentId).now();
         if (tournament==null)
@@ -321,7 +343,7 @@ public class MatchPlayScorer
             match.setTimestamp(null);
             match.setResultURI(TOURNAMENT_LIST_URI + "/" + tournamentId.toString() + "/result/" + match.getId().toString());
         }
-        return tournament;
+        return tournament.clean();
     }
 
 
@@ -334,7 +356,7 @@ public class MatchPlayScorer
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public List<SimpleResult> getAllResults(@Named(TOURNAMENT_ID_PARAM) Long tournamentId) throws NotFoundException
+    public List<SimpleResult> getAllResults(@Named(TOURNAMENT_ID_PARAM) Long tournamentId) throws ServiceException
     {
         Tournament tournament =  ofy().load().type(Tournament.class).id(tournamentId).now();
         if (tournament==null)
@@ -363,7 +385,7 @@ public class MatchPlayScorer
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public SimpleResult getMatchResult(@Named(TOURNAMENT_ID_PARAM) Long tournamentId, @Named(MATCH_ID_PARAM) Long matchId) throws NotFoundException
+    public SimpleResult getMatchResult(@Named(TOURNAMENT_ID_PARAM) Long tournamentId, @Named(MATCH_ID_PARAM) Long matchId) throws ServiceException
     {
         Match match = ofy().load().type(Match.class).id(matchId).now();
         if (match==null)
@@ -383,7 +405,7 @@ public class MatchPlayScorer
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public void updateMatchResult(@Named(TOURNAMENT_ID_PARAM) Long tournamentId, @Named(MATCH_ID_PARAM) Long matchId, SimpleResult newData) throws BadRequestException, NotFoundException
+    public void updateMatchResult(HttpServletRequest req, @Named(TOURNAMENT_ID_PARAM) Long tournamentId, @Named(MATCH_ID_PARAM) Long matchId, SimpleResult newData) throws ServiceException
     {
         try
         {
@@ -394,9 +416,11 @@ public class MatchPlayScorer
             throw new BadRequestException(e.getMessage());
         }
 
+
         Match match = ofy().load().type(Match.class).id(matchId).now();
         if (match==null)
             throw new NotFoundException("match not found");
+        checkAccessToken(req, match);
 
         if ( match.getHole() != newData.getH() || match.getResult() != newData.getR() )
         {
