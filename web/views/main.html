@@ -9,13 +9,8 @@
                 </div>
                 <div class="col-xs-10 col-sm-5">
                     <div class="input-group navbar-text">
-                        <input type="search" class="form-control input-sm search-query"
-                               placeholder="Filtro por nick"
-
-                               ng-model="playerFilter">
-                               <!--<datalist id="players">-->
-                                    <!--<option ng-repeat="player in playerList" value="{{player}}">-->
-                                <!--</datalist>-->
+                        <input type="search" class="form-control input-sm search-query" placeholder="Filtro por nick" ng-model="playerFilter"
+                               typeahead="player for player in playerList | filter:$viewValue">
                         <span class="input-group-addon" ng-click="playerFilter=''">
                             <span class="glyphicon glyphicon-remove"></span>
                         </span>
