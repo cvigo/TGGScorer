@@ -4,6 +4,7 @@
         <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Selección de torneo</h3>
+
                 </div>
                 <div class="panel-body">
                     <form id="tournament-form" role="form" ng-submit="searchTournament(passKey)">
@@ -11,7 +12,8 @@
                             <label for="passkey">Palabra clave:</label>
                             <input id="passkey" class="form-control" placeholder="palabra clave" type="text" autofocus="true" ng-model="passKey" ng-change="passkeyChange(passKey)">
                             <br>
-                            <button type="submit" id="btn-send" class="btn btn-primary" ng-disabled="!searchTournamentEnabled" data-loading-text="Buscando..." data-found-text="OK!" data-error-text="ERROR :-(">Enviar</button>
+                            <button type="submit" id="btn-send" class="btn btn-primary" ng-disabled="!searchTournamentEnabled" data-loading-text="Buscando..." data-found-text="OK!" data-error-text="ERROR :-(">Buscar</button>
+                            <button id="btn-edit" class="btn btn-danger" ng-click="editTournament(passKey)" ng-disabled="!searchTournamentEnabled" data-loading-text="Buscando..." data-found-text="OK!" data-error-text="ERROR :-(">Editar torneo</button>
                         </div>
                     </form>
                     <div collapse="!alertVisible">

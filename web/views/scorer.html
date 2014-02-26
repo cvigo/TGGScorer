@@ -8,16 +8,16 @@
                 <div class="col-sm-11">
                     <h3 class="row">
                         <div class="col-sm-4">
-                            <div class="row text-center scorerpanel">{{leftTeam}}</div>
+                            <div class="row text-center scorerpanel">{{tournamentDataSrv.leftTeamName}}</div>
                         </div>
                         <div class="col-sm-2">
-                            <div class="text-center scorerpanel {{leftTeam}} ">{{projectedResult().scoreL}}</div>
+                            <div class="text-center scorerpanel {{tournamentDataSrv.leftTeamName}} ">{{projectedResult().scoreL}}</div>
                         </div>
                         <div class="col-sm-2">
-                            <div class="text-center scorerpanel {{rightTeam}} ">{{projectedResult().scoreR}}</div>
+                            <div class="text-center scorerpanel {{tournamentDataSrv.rightTeamName}} ">{{projectedResult().scoreR}}</div>
                         </div>
                         <div class="col-sm-4">
-                            <div class="row text-center scorerpanel">{{rightTeam}}</div>
+                            <div class="row text-center scorerpanel">{{tournamentDataSrv.rightTeamName}}</div>
                         </div>
                     </h3>
                 </div>
@@ -31,10 +31,10 @@
             <div class="visible-xs row scorerpanel">
                 <div class="col-xs-10">
                     <div class="row">
-                        <div class="col-xs-8 text-left"><strong>{{leftTeam}}</strong></div>
-                        <div class="col-xs-4 text-center {{leftTeam}}"><strong>{{projectedResult().scoreL}}</strong></div>
-                        <div class="col-xs-8 text-left"><strong>{{rightTeam}}</strong></div>
-                        <div class="col-xs-4 text-center {{rightTeam}}"><strong>{{projectedResult().scoreR}}</strong></div>
+                        <div class="col-xs-8 text-left"><strong>{{tournamentDataSrv.leftTeamName}}</strong></div>
+                        <div class="col-xs-4 text-center {{tournamentDataSrv.leftTeamName}}"><strong>{{projectedResult().scoreL}}</strong></div>
+                        <div class="col-xs-8 text-left"><strong>{{tournamentDataSrv.rightTeamName}}</strong></div>
+                        <div class="col-xs-4 text-center {{tournamentDataSrv.rightTeamName}}"><strong>{{projectedResult().scoreR}}</strong></div>
                     </div>
                 </div>
                 <div class="col-xs-2">
@@ -111,16 +111,16 @@
                 <div class="col-sm-11">
                     <h3 class="row">
                         <div class="col-sm-4">
-                            <div class="row text-center scorerpanel">{{leftTeam}}</div>
+                            <div class="row text-center scorerpanel">{{tournamentDataSrv.leftTeamName}}</div>
                         </div>
                         <div class="col-sm-2">
-                            <div class="text-center scorerpanel {{leftTeam}} ">{{finalResult().scoreL}}</div>
+                            <div class="text-center scorerpanel {{tournamentDataSrv.leftTeamName}} ">{{finalResult().scoreL}}</div>
                         </div>
                         <div class="col-sm-2">
-                            <div class="text-center scorerpanel {{rightTeam}} ">{{finalResult().scoreR}}</div>
+                            <div class="text-center scorerpanel {{tournamentDataSrv.rightTeamName}} ">{{finalResult().scoreR}}</div>
                         </div>
                         <div class="col-sm-4">
-                            <div class="row text-center scorerpanel">{{rightTeam}}</div>
+                            <div class="row text-center scorerpanel">{{tournamentDataSrv.rightTeamName}}</div>
                         </div>
                     </h3>
                 </div>
@@ -132,10 +132,10 @@
             </div>
             <!-- Mobile design -->
             <div class="row scorerpanel visible-xs">
-                <div class="col-xs-8 text-left"><strong>{{leftTeam}}</strong></div>
-                <div class="col-xs-4 text-center {{leftTeam}}"><strong>{{finalResult().scoreL}}</strong></div>
-                <div class="col-xs-8 text-left"><strong>{{rightTeam}}</strong></div>
-                <div class="col-xs-4 text-center {{rightTeam}}"><strong>{{finalResult().scoreR}}</strong></div>
+                <div class="col-xs-8 text-left"><strong>{{tournamentDataSrv.leftTeamName}}</strong></div>
+                <div class="col-xs-4 text-center {{tournamentDataSrv.leftTeamName}}"><strong>{{finalResult().scoreL}}</strong></div>
+                <div class="col-xs-8 text-left"><strong>{{tournamentDataSrv.rightTeamName}}</strong></div>
+                <div class="col-xs-4 text-center {{tournamentDataSrv.rightTeamName}}"><strong>{{finalResult().scoreR}}</strong></div>
             </div>
         </div>
     </div>

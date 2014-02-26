@@ -21,8 +21,7 @@ appModule.controller("MainCtrl",
                          "$animate",
                          "$cookies",
                          "$http",
-                         "TournamentMin",
-                         "TournamentFull",
+                         "Tournament",
                          "Result",
                          function (
                              $scope,
@@ -32,8 +31,7 @@ appModule.controller("MainCtrl",
                              $animate,
                              $cookies,
                              $http,
-                             TournamentMin,
-                             TournamentFull,
+                             Tournament,
                              Result
                          )
 {
@@ -41,9 +39,11 @@ appModule.controller("MainCtrl",
     $scope.tournamentDataSrv = null; // this will store the tournament data retrieved from the server
     $scope.resultsSrv = []; // this will store de results received from the server
     $scope.playerList = []; // this feeds the players filter in the model
-    $scope.groups = [];
+    $scope.groups = [];   // this creates a visual representation of the matches, sorted and grouped by tee time. It keeps references to the tournamentDataSrv data
     $scope.refreshing = "null";
-    $scope.passKey = "";
+    $scope.tobeRemoved = [];
+
+    $scope.frequentTeams = ["Cosacos", "Bucaneros", "Corsarios", "Filibusteros"];
 
 /*    $scope.groups = [
         {
@@ -80,14 +80,9 @@ appModule.controller("MainCtrl",
                 ]
         }
     ];*/
-    $scope.rightTeam = "";
-    $scope.leftTeam = "";
-    $scope.rightColor = "";
-    $scope.leftColor = "";
 
     // template control properties
     $scope.lastMessage = {type:"success", text:MsgText.WORKING};
-
 
 
 
@@ -168,7 +163,7 @@ appModule.controller("MainCtrl",
  */
     $scope.loadTournament = function(tournamentId)
     {
-        $scope.tournamentDataSrv = TournamentMin.get({tournamentID:tournamentId},
+        $scope.tournamentDataSrv = Tournament.get({tournamentID:tournamentId, getResults:false},
             function(tournamentData)
             {
                 // get results in a single call
@@ -179,7 +174,7 @@ appModule.controller("MainCtrl",
                            {
                                $scope.resultsSrv = resultsArray.items;
 
-                               // results come in the same order than matches in TournamentMin call
+                               // results come in the same order than matches in Tournament call
                                for (match in $scope.tournamentDataSrv.matches)
                                {
                                    //store the reference to the result, so futures updates to the results object are automatically loaded into the template
@@ -193,14 +188,10 @@ appModule.controller("MainCtrl",
                            }
                 );
 
-                // this is the right location for the following block to make it run in parallel with the Results retrieval from the server
-                $scope.rightTeam = tournamentData.rightTeamName;
-                $scope.leftTeam = tournamentData.leftTeamName;
 
                 //TODO: store and retrieve colors in Server
-                $scope.rightColor = "";
-                $scope.leftColor = "";
 
+                // this is the right location for the following block to make it run in parallel with the Results retrieval from the server
                 $scope.addPlayers();
             },
             function(errMsg) //error callback
@@ -237,7 +228,7 @@ appModule.controller("MainCtrl",
                                  {
                                      //$scope.resultsSrv = resultsArray.items; // Don't do this, because $scope.resultsSrv would the copied
                                      //a new array instance, and references to results in $scope.tournamentDataSrv. would be lost
-                                     $scope.resultsSrv[index].r = result.r;
+                                     $scope.resultsSrv[index].r = result.r; // this also makes $scope.tournamentDataSrv.matches[index].result.r = result.r etc...
                                      $scope.resultsSrv[index].h = result.h;
                                      $scope.resultsSrv[index].ts = result.ts;
                                  },
@@ -360,7 +351,7 @@ appModule.controller("MainCtrl",
             if (match.startTime > lastStartTime) // is is a new group
             {
                 ++groupIndex;
-                $scope.groups.push( {number:groupIndex+1, matches:[] } );
+                $scope.groups.push( {number:groupIndex+1, startTime:match.startTime, matches:[] } );
                 $scope.groups[groupIndex].matches.push(match);
                 lastStartTime = match.startTime;
             }
@@ -540,7 +531,7 @@ appModule.controller("MainCtrl",
 
 /**
  * @ngdoc function
- * @name $scope.updateMatch
+ * @name $scope.putMatch
  * @function
  *
  * @param {match} match result to update, reference
@@ -600,22 +591,6 @@ appModule.controller("MainCtrl",
         return "OK";
     }
 
-    /**
-     * @ngdoc function
-     * @name $scope.getGroupStartTime
-     * @function
-     *
-     * @param {number} groupId index
-     *
-     * @description
-     * returns the group start time in the format hh:mm
-     *
-     * @returns {string} "OK" or descriptive error code
-     */
-    $scope.getGroupStartTime = function(groupId)
-    {
-        return ($scope.groups[groupId].matches[0].startTime).toLocaleTimeString().substr(0,5);
-    }
 
     /**
      * @ngdoc function
@@ -632,9 +607,9 @@ appModule.controller("MainCtrl",
     $scope.getLeadingTeamName = function(match)
     {
         if (match.result.r > 0)
-            return $scope.rightTeam;
+            return $scope.tournamentDataSrv.rightTeamName;
         else if (match.result.r < 0)
-            return $scope.leftTeam;
+            return $scope.tournamentDataSrv.leftTeamName;
         else
         return "allsquare";
 
@@ -682,7 +657,7 @@ appModule.controller("MainCtrl",
     {
         $("#btn-send").button("loading");
 
-        TournamentFull.get({tournamentID:$routeParams.tournamentID, passKey:passKey},
+        Tournament.get({tournamentID:$routeParams.tournamentID, passKey:passKey},
                        function(reply) // success callback
                        {
                            $("#btn-send").button("found");
@@ -723,6 +698,151 @@ appModule.controller("MainCtrl",
         $http.defaults.headers.delete =  {"x-PassKey": $scope.passKey};
         $http.defaults.headers.patch["x-PassKey"] = $scope.passKey;
     }
+
+
+    $scope.dateOptions =
+    {
+        "year-format": "YYYY",
+        "starting-day": 1,
+        "show-weeks": false,
+        "toggle-weeks-text": "'Semanas'"
+
+    };
+
+    $scope.openDatePicker = function($event)
+    {
+        $event.preventDefault();
+        $event.stopPropagation();
+
+        $scope.datePickerOpened = true;
+    };
+
+    $scope.addMatchToGroup = function(groupIndex, matchIndex)
+    {
+        if ($scope.groups[groupIndex].matches == null || $scope.groups[groupIndex].matches == undefined)
+            $scope.groups[groupIndex].matches = [];
+
+        var len = $scope.tournamentDataSrv.matches.push({orderInGroup: matchIndex, rightPlayer:"", leftPlayer:"", startTime: $scope.groups[groupIndex].startTime});
+        $scope.groups[groupIndex].matches.splice(matchIndex, 0,$scope.tournamentDataSrv.matches[len-1]);
+        $scope.reindexMatches(groupIndex);
+        var h = "stop"
+    }
+
+    $scope.storeForRemoval = function(match)
+    {
+        if (match.id != null && match.id != "")
+            $scope.tobeRemoved.push(match.id);
+    }
+
+    $scope.removeMatchFromGroup = function(groupIndex, matchIndex)
+    {
+        $scope.storeForRemoval($scope.groups[groupIndex].matches[matchIndex]);
+
+        var matches = $scope.groups[groupIndex].matches;
+        if ( matches.length===1 ) // I am removing the last one
+        {
+            matches[0].leftPlayer = matches[0].rightPlayer = "";
+            matches[0].orderInGroup = 0;
+            matches[0].startTime = $scope.groups[groupIndex].startTime;
+        }
+        else
+            matches.splice(matchIndex, 1);
+
+        $scope.reindexMatches(groupIndex);
+    }
+
+    $scope.reindexMatches = function(groupIndex)
+    {
+        var matches = $scope.groups[groupIndex].matches;
+        angular.forEach(matches, function (result, index)
+        {
+            matches[index].orderInGroup = index;
+            matches[index].startTime = $scope.groups[groupIndex].startTime;
+        });
+
+    }
+
+    $scope.reindexGroups = function()
+    {
+        angular.forEach($scope.groups, function (result, index)
+        {
+            groups[index].orderInGroup = index+1;
+            //TODO
+            // matches[index].startTime = $scope.groups[groupIndex].startTime;
+        });
+
+    }
+
+    $scope.addGroup = function(groupIndex)
+    {
+        var startTime;
+        if ($scope.groups == null || $scope.groups == undefined)
+        {
+            $scope.groups = [];
+            startTime = $scope.tournamentDataSrv.tournamentDate;
+        }
+        else
+            startTime = groupIndex == 0 ? new Date($scope.groups[0].startTime - 10*60*1000) : new Date($scope.groups[groupIndex-1].startTime.getTime() + 10*60*1000) ;
+        $scope.groups.splice(groupIndex, 0, {startTime: startTime});
+        $scope.addMatchToGroup(groupIndex, 0);
+        $scope.reindexGroups();
+    }
+
+    $scope.removeGroup = function(groupIndex)
+    {
+        var matches = $scope.groups[groupIndex].matches;
+        angular.forEach(matches, function (result, index)
+        {
+            $scope.storeForRemoval(matches[index]);
+        });
+
+        if ( $scope.groups.length===1 ) // I am removing the last one
+        {
+            $scope.groups[0].matches.length = 0;
+            $scope.groups[0].startTime = $scope.tournamentDataSrv.tournamentDate;
+            $scope.groups[0].number = 1;
+            $scope.addMatchToGroup(0, 0);
+        }
+        else
+            $scope.groups.splice(groupIndex, 1);
+
+        $scope.reindexGroups();
+    }
+
+    $scope.newTournament = function()
+    {
+        $scope.tournamentDataSrv = new Tournament();
+        $scope.tournamentDataSrv.leftTeamName = "";
+        $scope.tournamentDataSrv.rightTeamName = "";
+        $scope.tournamentDataSrv.passKey = $scope.passKey;
+        $scope.tournamentDataSrv.gameDate = new Date();
+        $scope.tournamentDataSrv.matches = [{leftPlayer:"", rightPlayer:"", startTime:tournamentDataSrv.gameDate, orderInGroup:0, result:{h:0, h:0, ts:new Date()}}];
+
+        $scope.createGroups();
+    }
+
+    $scope.putTournament = function()
+    {
+        $scope.tournamentDataSrv.passKey = $scope.passKey; // this is the only property kept on its own $scope variable
+
+        $scope.tournamentDataSrv.$save(
+            function(reply)
+            {
+                $scope.lastMessage = {type:"success", text:MsgText.SCORE_SENT};
+                //btn.button("sent");
+                //$timeout(function () {btn.button("reset")}, 2000);
+            },
+            function(errMsg) //error callback
+            {
+                $scope.displayAlertMessage("danger", errMsg.data.error.message, 0);
+                //btn.button("error");
+                //$timeout(function () {btn.button("reset")}, 2000);
+            });
+
+
+    }
+
+
 
 }]);
 

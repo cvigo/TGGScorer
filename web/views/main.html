@@ -32,7 +32,7 @@
                     <div class="panel-title">
                         <div class="row">
                             <div class="col-xs-7">
-                                <div class="text-left">{{getGroupStartTime(group.number-1)}}</div>
+                                <div class="text-left">{{group.startTime| startTimeHHMM}}</div>
                             </div>
                             <div class="col-xs-5">
                                 <button class="btn-block btn btn-sm btn-primary" data-loading-text="Enviando..." data-sent-text="Enviado!" data-error-text="ERROR :-(" ng-click="sendResult(group.number, $event)">Enviar!</button>
@@ -44,8 +44,8 @@
                     <form class="" role="form" id="formgroup">
                         <div id="match" ng-repeat="match in group.matches">
                             <div class="form-group">
-                                <div class="col-xs-6 text-center scorerpanel {{leftTeam}}"><span>{{match.leftPlayer}}</span></div>
-                                <div class="col-xs-6 text-center scorerpanel {{rightTeam}}"><span>{{match.rightPlayer}}</span></div>
+                                <div class="col-xs-6 text-center scorerpanel {{tournamentDataSrv.leftTeamName}}"><span>{{match.leftPlayer}}</span></div>
+                                <div class="col-xs-6 text-center scorerpanel {{tournamentDataSrv.rightTeamName}}"><span>{{match.rightPlayer}}</span></div>
                                 <div class="input-group">
                                     <span class="input-group-btn" ng-click="updateHole(match, -1)">
                                         <button class="btn btn-sm btn-default" type="button">

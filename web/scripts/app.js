@@ -14,6 +14,11 @@ appScorer.config(function ($routeProvider)
         templateUrl: "views/scorer.html",
         controller: "MainCtrl"
       })
+      .when("/edit/:tournamentID",
+      {
+        templateUrl: "views/tournament_editor.html",
+        controller: "MainCtrl"
+      })
       .otherwise(
       {
           templateUrl: "views/tournament_selection.html",
