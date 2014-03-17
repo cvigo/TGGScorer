@@ -299,6 +299,7 @@ appModule.controller("MainCtrl",
     {
         var btn = $(event.srcElement);
         btn.button("loading");
+
         // GAE endpoints not returning arrays whey they should, really sucks. This crappy code is caused by GAE
         for (var match in $scope.groups[groupNumber-1].matches)
         {
@@ -313,14 +314,12 @@ appModule.controller("MainCtrl",
                 function(reply)
                 {
                     $scope.lastMessage = {type:"success", text:MsgText.SCORE_SENT};
-                    //$("#alertPanel").show();
                     btn.button("sent");
                     $timeout(function () {btn.button("reset")}, 2000);
                 },
                 function(errMsg) //error callback
                 {
                     $scope.displayAlertMessage("danger", errMsg.data.error.message, 0);
-                    //$("#alertPanel").show();
                     btn.button("error");
                     $timeout(function () {btn.button("reset")}, 2000);
                 });
@@ -403,9 +402,18 @@ appModule.controller("MainCtrl",
  */
     $scope.initModel = function()
     {
+        if ($routeParams.tournamentID == "new")
+        {
+            $scope.tournamentDataSrv = new Tournament();
+            $scope.tournamentDataSrv.gameDate = new Date();
+            $scope.tournamentDataSrv.matches = [];
+            $scope.addGroup(0);
+        }
+        else
+            $scope.loadTournament($routeParams.tournamentID);
+
         $scope.passKey = $cookies.passKey;
         $scope.setPassKeyHeader();
-        $scope.loadTournament($routeParams.tournamentID);
     }
 
 
@@ -425,12 +433,6 @@ appModule.controller("MainCtrl",
             $scope.playerList.push($scope.tournamentDataSrv.matches[match].leftPlayer);
             $scope.playerList.push($scope.tournamentDataSrv.matches[match].rightPlayer);
         }
-
-        $('input.typeahead-players').typeahead({
-                                                   name: 'players',
-                                                   local: $scope.playerList
-                                               });
-
     }
 
 
@@ -653,23 +655,49 @@ appModule.controller("MainCtrl",
      * Searches a tournament by passkey. If succeeds, opens the player view screen
      *
      */
-    $scope.searchTournament = function(passKey)
+    $scope.searchTournament = function(passKey, successFn, errorFn)
+    {
+        return Tournament.get({tournamentID:$routeParams.tournamentID, passKey:passKey}, successFn, errorFn);
+    }
+
+    $scope.playTournament = function(passKey)
     {
         $("#btn-send").button("loading");
 
-        Tournament.get({tournamentID:$routeParams.tournamentID, passKey:passKey},
-                       function(reply) // success callback
-                       {
-                           $("#btn-send").button("found");
-                           $cookies.passKey = $scope.passKey;
-                           window.location = '#/playerView/' + reply.id;
-                       },
-                       function(errMsg) //error callback
-                       {
-                           $("#btn-send").button("error");
-                           $scope.displayAlertMessage("danger", errMsg.data.error.message, 0);
-                           $timeout(function () {$("#btn-send").button("reset")}, 2000);
-                       }
+        $scope.searchTournament(passKey,
+                                function(reply) // success callback
+                                {
+                                    $("#btn-send").button("found");
+                                    $cookies.passKey = $scope.passKey;
+                                    window.location = '#/playerView/' + reply.id;
+                                },
+                                function(errMsg) //error callback
+                                {
+                                    $("#btn-send").button("error");
+                                    $scope.displayAlertMessage("danger", errMsg.data.error.message, 0);
+                                    $timeout(function () {$("#btn-send").button("reset")}, 2000);
+                                }
+        );
+    }
+
+
+    $scope.editTournament = function(passKey)
+    {
+        $("#btn-edit").button("loading");
+
+        $scope.searchTournament(passKey,
+                                function(reply) // success callback
+                                {
+                                    $("#btn-send").button("found");
+                                    $cookies.passKey = $scope.passKey;
+                                    window.location = '#/edit/' + reply.id;
+                                },
+                                function(errMsg) //error callback
+                                {
+                                    $("#btn-edit").button("error");
+                                    $scope.displayAlertMessage("danger", errMsg.data.error.message, 0);
+                                    $timeout(function () {$("#btn-send").button("reset")}, 2000);
+                                }
         );
     }
 
@@ -705,7 +733,7 @@ appModule.controller("MainCtrl",
         "year-format": "YYYY",
         "starting-day": 1,
         "show-weeks": false,
-        "toggle-weeks-text": "'Semanas'"
+        "toggle-weeks-text": "Semanas"
 
     };
 
@@ -725,18 +753,16 @@ appModule.controller("MainCtrl",
         var len = $scope.tournamentDataSrv.matches.push({orderInGroup: matchIndex, rightPlayer:"", leftPlayer:"", startTime: $scope.groups[groupIndex].startTime});
         $scope.groups[groupIndex].matches.splice(matchIndex, 0,$scope.tournamentDataSrv.matches[len-1]);
         $scope.reindexMatches(groupIndex);
-        var h = "stop"
     }
 
-    $scope.storeForRemoval = function(match)
+    $scope.removeMatch = function(match)
     {
-        if (match.id != null && match.id != "")
-            $scope.tobeRemoved.push(match.id);
+        $scope.tournamentDataSrv.matches.splice($scope.tournamentDataSrv.matches.indexOf(match), 1);
     }
 
     $scope.removeMatchFromGroup = function(groupIndex, matchIndex)
     {
-        $scope.storeForRemoval($scope.groups[groupIndex].matches[matchIndex]);
+        $scope.removeMatch($scope.groups[groupIndex].matches[matchIndex]);
 
         var matches = $scope.groups[groupIndex].matches;
         if ( matches.length===1 ) // I am removing the last one
@@ -754,32 +780,29 @@ appModule.controller("MainCtrl",
     $scope.reindexMatches = function(groupIndex)
     {
         var matches = $scope.groups[groupIndex].matches;
-        angular.forEach(matches, function (result, index)
+        var i=0;
+        for (i=0; i<matches.length; ++i)
         {
-            matches[index].orderInGroup = index;
-            matches[index].startTime = $scope.groups[groupIndex].startTime;
-        });
+            matches[i].orderInGroup = i;
+            matches[i].startTime = $scope.groups[groupIndex].startTime;
+        }
 
     }
 
     $scope.reindexGroups = function()
     {
-        angular.forEach($scope.groups, function (result, index)
-        {
-            groups[index].orderInGroup = index+1;
-            //TODO
-            // matches[index].startTime = $scope.groups[groupIndex].startTime;
-        });
-
+        var i=0;
+        for (i=0; i<$scope.groups.length; ++i)
+            $scope.reindexMatches(i);
     }
 
     $scope.addGroup = function(groupIndex)
     {
         var startTime;
-        if ($scope.groups == null || $scope.groups == undefined)
+        if ($scope.groups == null || $scope.groups == undefined || $scope.groups.length == 0 )  // adding the first group
         {
             $scope.groups = [];
-            startTime = $scope.tournamentDataSrv.tournamentDate;
+            startTime = $scope.tournamentDataSrv.gameDate;
         }
         else
             startTime = groupIndex == 0 ? new Date($scope.groups[0].startTime - 10*60*1000) : new Date($scope.groups[groupIndex-1].startTime.getTime() + 10*60*1000) ;
@@ -791,16 +814,17 @@ appModule.controller("MainCtrl",
     $scope.removeGroup = function(groupIndex)
     {
         var matches = $scope.groups[groupIndex].matches;
-        angular.forEach(matches, function (result, index)
+        angular.forEach(matches, function (match, index)
         {
-            $scope.storeForRemoval(matches[index]);
+            $scope.removeMatch(match);
         });
 
         if ( $scope.groups.length===1 ) // I am removing the last one
         {
             $scope.groups[0].matches.length = 0;
-            $scope.groups[0].startTime = $scope.tournamentDataSrv.tournamentDate;
-            $scope.groups[0].number = 1;
+            $scope.groups[0].startTime = $scope.tournamentDataSrv.gameDate;
+            $scope.groups[0].startTime.setHours(9,0,0,0);
+                $scope.groups[0].number = 1;
             $scope.addMatchToGroup(0, 0);
         }
         else
@@ -824,6 +848,12 @@ appModule.controller("MainCtrl",
     $scope.putTournament = function()
     {
         $scope.tournamentDataSrv.passKey = $scope.passKey; // this is the only property kept on its own $scope variable
+        $scope.propagateDates();
+        $scope.createGroups();
+        $scope.reindexGroups();
+
+
+        console.log("putTournament: " + $scope.tournamentDataSrv.toString());
 
         $scope.tournamentDataSrv.$save(
             function(reply)
@@ -831,6 +861,7 @@ appModule.controller("MainCtrl",
                 $scope.lastMessage = {type:"success", text:MsgText.SCORE_SENT};
                 //btn.button("sent");
                 //$timeout(function () {btn.button("reset")}, 2000);
+                //$scope.createGroups();
             },
             function(errMsg) //error callback
             {
@@ -842,7 +873,64 @@ appModule.controller("MainCtrl",
 
     }
 
+    $scope.propagateDates = function()
+    {
+        $scope.setMatchesTimeToGroupTime();
+        $scope.setMatchesDateToTournamentDate();
+    }
 
+    $scope.setMatchesDateToTournamentDate = function()
+    {
+        var i=0;
+        for (i=0; i<$scope.tournamentDataSrv.matches.length; ++i)
+        {
+            $scope.tournamentDataSrv.matches[i].startTime.setFullYear($scope.tournamentDataSrv.gameDate.getFullYear());
+            $scope.tournamentDataSrv.matches[i].startTime.setMonth($scope.tournamentDataSrv.gameDate.getMonth());
+            $scope.tournamentDataSrv.matches[i].startTime.setDate($scope.tournamentDataSrv.gameDate.getDate());
+            $scope.tournamentDataSrv.matches[i].startTime.setSeconds(0);
+            $scope.tournamentDataSrv.matches[i].startTime.setMilliseconds(0);
+
+            console.log("setMatchesDateToTournamentDate: " + $scope.tournamentDataSrv.matches[i].id + ": " + $scope.tournamentDataSrv.matches[i].leftPlayer + " vs " + $scope.tournamentDataSrv.matches[i].rightPlayer + "; time:" + $scope.tournamentDataSrv.matches[i].startTime);
+
+        }
+    }
+
+    $scope.setMatchesTimeToGroupTime = function()
+    {
+        var i= 0, j=0;
+        for (i=0; i<$scope.groups.length; ++i)
+            for (j=0; j<$scope.groups[i].matches.length; ++j)
+            {
+                $scope.groups[i].matches[j].startTime = $scope.groups[i].startTime;
+                console.log("setMatchesTimeToGroupTime: " + $scope.groups[i].matches[j].leftPlayer + " vs " + $scope.groups[i].matches[j].rightPlayer + "; time:" + $scope.groups[i].matches[j].startTime);
+            }
+    }
+
+    $scope.validateTournament = function()
+    {
+        return
+            (
+                $scope.tournamentDataSrv.leftTeamName != null && !$scope.tournamentDataSrv.leftTeamName.isEmpty()
+                &&
+                $scope.tournamentDataSrv.rightTeamName != null && !$scope.tournamentDataSrv.rightTeamName.isEmpty()
+                &&
+                $scope.tournamentDataSrv.passKey != null && !$scope.tournamentDataSrv.passKey.isEmpty()
+                &&
+                $scope.tournamentDataSrv.leftTeamName != null && !$scope.tournamentDataSrv.leftTeamName.isEmpty()
+                &&
+                $scope.tournamentDataSrv.leftTeamName != null && !$scope.tournamentDataSrv.leftTeamName.isEmpty()
+                &&
+                $scope.tournamentDataSrv.leftTeamName != null && !$scope.tournamentDataSrv.leftTeamName.isEmpty()
+                &&
+                $scope.tournamentDataSrv.leftTeamName != null && !$scope.tournamentDataSrv.leftTeamName.isEmpty()
+            );
+    }
+
+
+    $scope.newTournament = function()
+    {
+        window.location = '#/edit/new';
+    }
 
 }]);
 

@@ -1,0 +1,85 @@
+div(ng-init='initModel()', xmlns='http://www.w3.org/1999/html')
+    nav.navbar.navbar-fixed-top.background-white(role='navigation')
+        div.container-fluid
+            button#btn-save.btn.btn-primary.btn-sm.navbar-text.pull-right(form="tournament-form" type='submit', ng-disabled='validateTournament()') Grabar Torneo
+    div.container-fluid(style='padding-top: 65px;')
+        form#tournament-form.form(role='form', ng-submit='putTournament()')
+            div.panel.panel-default
+                div.panel-heading
+                    h3.panel-title Fecha y Equipos
+                    div.visible-xs .xs
+                    div.visible-sm .sm
+                    div.visible-md .ms
+                    div.visible-lg .lg
+                div.panel-body
+                    //The Tournament Header
+                    div.row
+                        div.col-xs-6
+                            label(for='leftTeam') Equipo izq.
+                            input#leftTeam.text.form-control.input-sm(placeholder='Equipo izq.', typeahead='team for team in frequentTeams | filter:$viewValue', ng-model='tournamentDataSrv.leftTeamName', ng-required='true')
+                        div.col-xs-6
+                            label(for='rightTeam') Equipo dcha.
+                            input#rightTeam.text.form-control.input-sm(placeholder='Equipo izq.', typeahead='team for team in frequentTeams | filter:$viewValue', ng-model='tournamentDataSrv.rightTeamName', ng-required='true')
+                    br
+                    div.row
+                        div.col-xs-6
+                            label(for='tournamentdate') Fecha
+                            div#tournamentdate.input-group.input-group-sm
+                                input.form-control( type='text',
+                                                    ng-model='tournamentDataSrv.gameDate',
+                                                    ng-required='true',
+                                                    is-open='datePickerOpened',
+                                                    datepicker-popup='dd-MMM-yyyy',
+                                                    datepicker-options='dateOptions',
+                                                    clear-text='Borrar',
+                                                    close-text='Cerrar',
+                                                    current-text='Hoy',
+                                                    toggle-weeks-text='Semanas')
+                                span.input-group-btn
+                                    button.btn.btn-default(ng-click='openDatePicker($event)')
+                                        i.glyphicon.glyphicon-calendar
+                        div.col-xs-6
+                            label(for='passkey') Palabra clave
+                            input#passkey.form-control.input-sm(type='text', ng-model='passKey', ng-required='true')
+                    // br
+                    // button#btn-saveTournament.btn.btn-primary.btn-sm(type='submit', ng-disabled='validateTournament()') Grabar Torneo
+            //
+               The Matches
+            div.panel.panel-default.my-repeat-animation(ng-repeat='group in groups')
+                div.panel-heading
+                    div.row
+                        div.col-xs-7
+                            h3.panel-title Grupo {{group.number}} ({{group.startTime | date:"HH:mm"}})
+                        div.col-xs-5
+                            div.btn-group.btn-group-sm.pull-right
+                                button.btn.btn-default(ng-click='addGroup($index+1)')
+                                    i.glyphicon.glyphicon-plus
+                                button.btn.btn-default(ng-click='removeGroup($index)')
+                                    i.glyphicon.glyphicon-minus
+                div.panel-body
+                    div.row
+                        div.col-xs-3.col-sm-2.col-md-1
+                            label(for='startTime') Salida
+                        div.col-xs-9
+                            div#startTime(ng-model='group.startTime')
+                                timepicker(hour-step='1', minute-step='10', show-meridian='false', mousewheel="false")
+                    div.row
+                        div.col-xs-6.col-sm-5
+                            label(for='leftPlayer') {{tournamentDataSrv.leftTeamName}}
+                        div.col-xs-6.col-sm-5
+                            label(for='rightPlayer') {{tournamentDataSrv.rightTeamName}}
+                    div.row.my-repeat-animation(ng-repeat='match in group.matches')
+                        div.col-xs-6.col-sm-5
+                            input#leftPlayer.text.input-sm.form-control(ng-class="tournamentDataSrv.leftTeamName", placeholder='Jugador {{tournamentDataSrv.leftTeamName}}', ng-required='true', ng-model='match.leftPlayer')
+                        div.col-xs-6.col-sm-5
+                            input#rightPlayer.text.input-sm.form-control(ng-class="tournamentDataSrv.rightTeamName", placeholder='Jugador {{tournamentDataSrv.rightTeamName}}', ng-required='true', ng-model='match.rightPlayer')
+                        div.col-xs-12.col-sm-2
+                            div.btn-group.btn-group-sm
+                                button.btn.btn-default(ng-click='addMatchToGroup($parent.$index, $index+1)')
+                                    i.glyphicon.glyphicon-plus
+                                button.btn.btn-default(ng-click='removeMatchFromGroup($parent.$index, $index)')
+                                    i.glyphicon.glyphicon-minus
+                            div.visible-xs
+                                br
+                    //
+                      <button type="submit" id="btn-saveMatch" class="btn btn-primary">Grabar Torneo</button>

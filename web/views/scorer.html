@@ -1,143 +1,131 @@
+
 <div ng-init="initModel()" xmlns="http://www.w3.org/1999/html">
-    <div class="container galaxia-background" id="scorerpanel">
-
-        <!--Teams header projected result-->
-        <div class="container" id="header">
-            <!-- Tablet and Desktop design -->
-            <div class="hidden-xs row">
-                <div class="col-sm-11">
-                    <h3 class="row">
-                        <div class="col-sm-4">
-                            <div class="row text-center scorerpanel">{{tournamentDataSrv.leftTeamName}}</div>
-                        </div>
-                        <div class="col-sm-2">
-                            <div class="text-center scorerpanel {{tournamentDataSrv.leftTeamName}} ">{{projectedResult().scoreL}}</div>
-                        </div>
-                        <div class="col-sm-2">
-                            <div class="text-center scorerpanel {{tournamentDataSrv.rightTeamName}} ">{{projectedResult().scoreR}}</div>
-                        </div>
-                        <div class="col-sm-4">
-                            <div class="row text-center scorerpanel">{{tournamentDataSrv.rightTeamName}}</div>
-                        </div>
-                    </h3>
-                </div>
-                <div class="col-sm-1">
-                    <h3 class="btn btn-primary" ng-click="reloadResults()">
-                        <span class="glyphicon glyphicon-refresh {{refreshing}}"></span>
-                    </h3>
-                </div>
+  <div id="scorerpanel" class="container galaxia-background">
+    <!-- Teams header projected result-->
+    <div id="header" class="container">
+      <!-- Tablet and Desktop design-->
+      <div class="hidden-xs row">
+        <div class="col-sm-11">
+          <h3 class="row">
+            <div class="col-sm-4">
+              <div class="row text-center scorerpanel">{{tournamentDataSrv.leftTeamName}}</div>
             </div>
-            <!-- Mobile design -->
-            <div class="visible-xs row scorerpanel">
-                <div class="col-xs-10">
-                    <div class="row">
-                        <div class="col-xs-8 text-left"><strong>{{tournamentDataSrv.leftTeamName}}</strong></div>
-                        <div class="col-xs-4 text-center {{tournamentDataSrv.leftTeamName}}"><strong>{{projectedResult().scoreL}}</strong></div>
-                        <div class="col-xs-8 text-left"><strong>{{tournamentDataSrv.rightTeamName}}</strong></div>
-                        <div class="col-xs-4 text-center {{tournamentDataSrv.rightTeamName}}"><strong>{{projectedResult().scoreR}}</strong></div>
-                    </div>
-                </div>
-                <div class="col-xs-2">
-                    <div class="row">
-                        <div class="pull-right btn btn-primary button-refresh" ng-click="reloadResults()">
-                            <span class="glyphicon glyphicon-refresh {{refreshing}}"></span>
-                        </div>
-                    </div>
-                </div>
+            <div class="col-sm-2">
+              <div ng-class="tournamentDataSrv.leftTeamName" class="text-center scorerpanel">{{projectedResult().scoreL}}</div>
             </div>
+            <div class="col-sm-2">
+              <div ng-class="tournamentDataSrv.rightTeamName" class="text-center scorerpanel">{{projectedResult().scoreR}}</div>
+            </div>
+            <div class="col-sm-4">
+              <div class="row text-center scorerpanel">{{tournamentDataSrv.rightTeamName}}</div>
+            </div>
+          </h3>
         </div>
-
-        <!--individual results-->
-        <div class="container" id="results">
-            <div class="my-repeat-animation" id="group{{$index}}" ng-repeat="group in groups | filter:playerFilter">
-                <div class="row my-repeat-animation" ng-repeat="match in group.matches">
-                    <!-- Tablet and Desktop design -->
-                    <div id="match_desktop_{{match.id}}" class="hidden-xs score-update-animation">
-                        <div id="leftside" class="col-sm-5">
-                            <div class="row scorerpanel {{getLeadingTeamName(match)}} " ng-class="{neutral:match.result.r >= 0}">
-                                <div class="col-sm-4 text-center">
-                                    <div ng-show="match.result.r <= 0">{{match | prettyresultShort}}</div>
-                                </div>
-                                <div class="col-sm-8 text-right" ng-class="{neutral:match.result.r >= 0}">{{match.leftPlayer}}</div>
-                            </div>
-                        </div>
-                        <div id="holetablet" class="col-sm-1">
-                            <div class="scorerpanel neutral text-center">{{match | prettyholeShort}}</div>
-                        </div>
-                        <div id="rightside" class=" col-sm-5">
-                            <div class="row scorerpanel  {{getLeadingTeamName(match)}} " ng-class="{neutral:match.result.r <= 0}">
-                                <div class="col-sm-8 text-left ">{{match.rightPlayer}}</div>
-                                <div class="col-sm-4 text-center ">
-                                    <div ng-show="match.result.r >= 0">{{match | prettyresultShort}}</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="lastupdate" class=" col-sm-1">
-                            <div class="scorerpanel text-center neutral">
-                                <small>{{match.result.ts | elapsedMM}}</small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Mobile design -->
-                    <div id="match_mobile_{{match.id}}" class="visible-xs score-update-animation">
-                        <div id="playersside" class="col-xs-5">
-                            <div class="row scorerpanel">
-                                <div class="col-xs-12 text-left neutral">{{match.leftPlayer}}</div>
-                                <div class="col-xs-12 text-left neutral">{{match.rightPlayer}}</div>
-                            </div>
-                        </div>
-                        <div id="result" class="col-xs-5">
-                            <div class="scorerpanel text-center {{getLeadingTeamName(match)}}">
-                                <div ng-show="match.result.r < 0">{{match.leftPlayer}}</div>
-                                <div ng-show="match.result.r > 0">{{match.rightPlayer}}</div>
-                                <div ng-show="match.result.r == 0">All Square</div>
-                                {{match | prettyresultShort}}
-                            </div>
-                        </div>
-                        <div id="holemobile" class="col-xs-2">
-                            <div class="row scorerpanel neutral text-center holemobile">{{match | prettyholeShort}}</div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
+        <div class="col-sm-1">
+          <h3 ng-click="reloadResults()" class="btn btn-primary"><span ng-class="refreshing" class="glyphicon glyphicon-refresh"></span></h3>
         </div>
-
-        <!--Teams footer final result-->
-        <div class="container" id="footer">
-            <!-- Tablet and Desktop design -->
-            <div class="hidden-xs row">
-                <div class="col-sm-11">
-                    <h3 class="row">
-                        <div class="col-sm-4">
-                            <div class="row text-center scorerpanel">{{tournamentDataSrv.leftTeamName}}</div>
-                        </div>
-                        <div class="col-sm-2">
-                            <div class="text-center scorerpanel {{tournamentDataSrv.leftTeamName}} ">{{finalResult().scoreL}}</div>
-                        </div>
-                        <div class="col-sm-2">
-                            <div class="text-center scorerpanel {{tournamentDataSrv.rightTeamName}} ">{{finalResult().scoreR}}</div>
-                        </div>
-                        <div class="col-sm-4">
-                            <div class="row text-center scorerpanel">{{tournamentDataSrv.rightTeamName}}</div>
-                        </div>
-                    </h3>
-                </div>
-                <div class="col-sm-1">
-                    <h3 class="btn btn-primary" ng-click="reloadResults()">
-                        <span class="glyphicon glyphicon-refresh {{refreshing}}"></span>
-                    </h3>
-                </div>
-            </div>
-            <!-- Mobile design -->
-            <div class="row scorerpanel visible-xs">
-                <div class="col-xs-8 text-left"><strong>{{tournamentDataSrv.leftTeamName}}</strong></div>
-                <div class="col-xs-4 text-center {{tournamentDataSrv.leftTeamName}}"><strong>{{finalResult().scoreL}}</strong></div>
-                <div class="col-xs-8 text-left"><strong>{{tournamentDataSrv.rightTeamName}}</strong></div>
-                <div class="col-xs-4 text-center {{tournamentDataSrv.rightTeamName}}"><strong>{{finalResult().scoreR}}</strong></div>
-            </div>
+      </div>
+      <!-- Mobile design-->
+      <div class="visible-xs row scorerpanel">
+        <div class="col-xs-10">
+          <div class="row">
+            <div class="col-xs-8 text-left"><strong>{{tournamentDataSrv.leftTeamName}}</strong></div>
+            <div ng-class="tournamentDataSrv.leftTeamName" class="col-xs-4 text-center"><strong>{{projectedResult().scoreL}}</strong></div>
+            <div class="col-xs-8 text-left"><strong>{{tournamentDataSrv.rightTeamName}}</strong></div>
+            <div ng-class="tournamentDataSrv.rightTeamName" class="col-xs-4 text-center"><strong>{{projectedResult().scoreR}}</strong></div>
+          </div>
         </div>
+        <div class="col-xs-2">
+          <div class="row">
+            <div ng-click="reloadResults()" class="pull-right btn btn-primary button-refresh"><span ng-class="refreshing" class="glyphicon glyphicon-refresh"></span></div>
+          </div>
+        </div>
+      </div>
     </div>
-
+    <!-- individual results-->
+    <div id="results" class="container">
+      <div ng-repeat="group in groups | filter:playerFilter" class="my-repeat-animation">
+        <div ng-repeat="match in group.matches" class="row my-repeat-animation">
+          <!-- Tablet and Desktop design-->
+          <div id="match_desktop_{{match.id}}" class="hidden-xs score-update-animation">
+            <div id="leftside" class="col-sm-5">
+              <!--.row.scorerpanel(ng-class='{getLeadingTeamName(match):true, neutral:match.result.r >= 0}')-->
+              <div ng-class="{neutral:match.result.r &gt;= 0}" class="row scorerpanel {{getLeadingTeamName(match)}}">
+                <div class="col-sm-4 text-center">
+                  <div ng-show="match.result.r&lt;=0">{{match | prettyresultShort}}</div>
+                </div>
+                <div ng-class="{neutral:match.result.r&gt;=0}" class="col-sm-8 text-right">{{match.leftPlayer}}</div>
+              </div>
+            </div>
+            <div id="holetablet" class="col-sm-1">
+              <div class="scorerpanel neutral text-center">{{match | prettyholeShort}}</div>
+            </div>
+            <div id="rightside" class="col-sm-5">
+              <!--.row.scorerpanel(ng-class="{getLeadingTeamName(match):true, neutral:match.result.r <= 0}")-->
+              <div ng-class="{neutral:match.result.r &lt;= 0}" class="row scorerpanel {{getLeadingTeamName(match)}}">
+                <div class="col-sm-8 text-left">{{match.rightPlayer}}</div>
+                <div class="col-sm-4 text-center">
+                  <div ng-show="match.result.r&gt;=0">{{match | prettyresultShort}}</div>
+                </div>
+              </div>
+            </div>
+            <div id="lastupdate" class="col-sm-1">
+              <div class="scorerpanel text-center neutral"><small>{{match.result.ts | elapsedMM}}</small></div>
+            </div>
+          </div>
+          <!-- Mobile design-->
+          <div id="match_mobile_{{match.id}}" class="visible-xs score-update-animation">
+            <div id="playersside" class="col-xs-5">
+              <div class="row scorerpanel">
+                <div class="col-xs-12 text-left neutral">{{match.leftPlayer}}</div>
+                <div class="col-xs-12 text-left neutral">{{match.rightPlayer}}</div>
+              </div>
+            </div>
+            <div id="result" class="col-xs-5">
+              <div ng-class="getLeadingTeamName(match)" class="scorerpanel text-center">
+                <div ng-show="match.result.r &lt; 0">{{match.leftPlayer}}</div>
+                <div ng-show="match.result.r &gt; 0">{{match.rightPlayer}}</div>
+                <div ng-show="match.result.r == 0">All Square</div>{{match | prettyresultShort}}
+              </div>
+            </div>
+            <div id="holemobile" class="col-xs-2">
+              <div class="row scorerpanel neutral text-center holemobile">{{match | prettyholeShort}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Teams footer final result-->
+    <div id="footer" class="container">
+      <!-- Tablet and Desktop design-->
+      <div class="hidden-xs row">
+        <div class="col-sm-11">
+          <h3 class="row">
+            <div class="col-sm-4">
+              <div class="row text-center scorerpanel">{{tournamentDataSrv.leftTeamName}}</div>
+            </div>
+            <div class="col-sm-2">
+              <div ng-class="tournamentDataSrv.leftTeamName" class="text-center scorerpanel">{{finalResult().scoreL}}</div>
+            </div>
+            <div class="col-sm-2">
+              <div ng-class="tournamentDataSrv.rightTeamName" class="text-center scorerpanel">{{finalResult().scoreR}}</div>
+            </div>
+            <div class="col-sm-4">
+              <div class="row text-center scorerpanel">{{tournamentDataSrv.rightTeamName}}</div>
+            </div>
+          </h3>
+        </div>
+        <div class="col-sm-1">
+          <h3 ng-click="reloadResults()" class="btn btn-primary"><span ng-class="refreshing" class="glyphicon glyphicon-refresh"></span></h3>
+        </div>
+      </div>
+      <!-- Mobile design-->
+      <div class="row scorerpanel visible-xs">
+        <div class="col-xs-8 text-left"><strong>{{tournamentDataSrv.leftTeamName}}</strong></div>
+        <div ng-class="tournamentDataSrv.leftTeamName" class="col-xs-4 text-center"><strong>{{finalResult().scoreL}}</strong></div>
+        <div class="col-xs-8 text-left"><strong>{{tournamentDataSrv.rightTeamName}}</strong></div>
+        <div ng-class="tournamentDataSrv.rightTeamName" class="col-xs-4 text-center"><strong>{{finalResult().scoreR}}</strong></div>
+      </div>
+    </div>
+  </div>
 </div>

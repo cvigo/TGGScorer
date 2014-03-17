@@ -156,6 +156,7 @@ public class Match
         if (newData.getStartTime() != null) setStartTime(newData.getStartTime());
         if (newData.getOrderInGroup() != null) setOrderInGroup(newData.getOrderInGroup());
         if (newData.getResult() != null && newData.getResult().isValid()) setResult(newData.getResult());
+        if (newData.getPassKey() != null && !newData.getPassKey().isEmpty() ) setPassKey(newData.getPassKey());
 
         getResult().setTs(new Date());
     }

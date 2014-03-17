@@ -129,6 +129,13 @@ public class Tournament
         return matches;
     }
 
+    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
+    public void setMatchRefs(List<Ref<Match>> refs)
+    {
+        matches.clear();
+        matches = refs;
+    }
+
     public List<Match> getMatches()
     {
         List<Match> ret = new ArrayList<>();

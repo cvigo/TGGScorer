@@ -1,0 +1,97 @@
+{
+    "gameDate": "2014-01-01T08:00:00.000",
+    "leftTeamName": "Bucaneros",
+    "rightTeamName": "Filibusteros",
+    "passKey": "robatogas",
+    "matches":
+        [
+            {
+                "orderInGroup": 0,
+                "leftPlayer": "msotomayor",
+                "rightPlayer": "pakito",
+                "result":
+                {
+                    "h": 0,
+                    "r": 0
+                },
+                "startTime": "2013-01-01T09:00:00.000+02:00"
+            },
+            {
+                "orderInGroup": 1,
+                "leftPlayer": "cvigo",
+                "rightPlayer": "opre",
+                "result":
+                {
+                    "h": 0,
+                    "r": 0
+                },
+                "startTime": "2013-01-01T09:00:00.000+02:00"
+            },
+            {
+                "orderInGroup": 0,
+                "leftPlayer": "Richygbravo",
+                "rightPlayer": "maxxer",
+                "result":
+                {
+                    "h": 0,
+                    "r": 0
+                },
+                "startTime": "2013-01-01T09:10:00.000+02:00"
+            },
+            {
+                "orderInGroup": 1,
+                "leftPlayer": "Vampiro",
+                "rightPlayer": "Alanch",
+                "result":
+                {
+                    "h": 0,
+                    "r": 0
+                },
+                "startTime": "2013-01-01T09:10:00.000+02:00"
+            },
+            {
+                "orderInGroup": 0,
+                "leftPlayer": "Juanito",
+                "rightPlayer": "Claxh",
+                "result":
+                {
+                    "h": 0,
+                    "r": 0
+                },
+                "startTime": "2013-01-01T09:20:00.000+02:00"
+            },
+            {
+                "orderInGroup": 1,
+                "leftPlayer": "JPretor",
+                "rightPlayer": "Cucaracho",
+                "result":
+                {
+                    "h": 0,
+                    "r": 0
+                },
+                "startTime": "2013-01-01T09:20:00.000+02:00"
+            },
+            {
+                "orderInGroup": 0,
+                "leftPlayer": "Action",
+                "rightPlayer": "TakeDeadAim",
+                "result":
+                {
+                    "h": 0,
+                    "r": 0
+                },
+                "startTime": "2013-01-01T09:30:00.000+02:00"
+            },
+            {
+                "orderInGroup": 1,
+                "leftPlayer": "malaguti",
+                "rightPlayer": "Oficinista",
+                "result":
+                {
+                    "h": 0,
+                    "r": 0
+                },
+                "startTime": "2013-01-01T09:30:00.000+02:00"
+            }
+        ]
+}
