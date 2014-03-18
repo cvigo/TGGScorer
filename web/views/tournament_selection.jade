@@ -5,30 +5,32 @@ div(xmlns='http://www.w3.org/1999/html')
             .panel-heading
                 h3.panel-title Selección de torneo
             .panel-body
-                form#tournament-form(role='form', ng-submit='playTournament(passKey)')
+                form#tournament-form(role='form', ng-submit='playTournament(passKey, $event)')
                     label(for='passkey') Palabra clave:
                     input#passkey.form-control(placeholder='palabra clave', type='text', autofocus='true', ng-model='passKey', ng-change='passkeyChange(passKey)')
                     br
                     div.row
                         div.col-xs-12.col-sm-3
-                            button#btn-send.btn.btn-primary.center-block(type='submit',
-                                                            ng-disabled='!searchTournamentEnabled',
-                                                            data-loading-text='Buscando...',
-                                                            data-found-text='OK!',
-                                                            data-error-text='ERROR :-(')
-                                                            |Introducir resultados
+                            button#btn-send.btn.btn-primary.center-block(   type='submit',
+                                                                            ng-disabled='!searchTournamentEnabled',
+                                                                            data-loading-text='Buscando...',
+                                                                            data-found-text='OK!',
+                                                                            data-error-text='ERROR :-(')
+                                                                            |Introducir resultados
                             div.visible-xs
                                 br
                         div.col-xs-12.col-sm-3
-                            button#btn-edit.btn.btn-danger.center-block( ng-click='editTournament(passKey)',
-                                                            ng-disabled='!searchTournamentEnabled',
-                                                            data-loading-text='Buscando...',
-                                                            data-found-text='OK!',
-                                                            data-error-text='ERROR :-(')
-                                                            |Editar torneo
+                            button#btn-edit.btn.btn-danger.center-block(type='button',
+                                                                        ng-click='editTournament(passKey, $event)',
+                                                                        ng-disabled='!searchTournamentEnabled',
+                                                                        data-loading-text='Buscando...',
+                                                                        data-found-text='OK!',
+                                                                        data-error-text='ERROR :-(')
+                                                                        |Editar torneo
                             div.visible-xs
                                 br
                         div.col-xs-12.col-sm-3
-                            button#btn-new.btn.btn-info.center-block( ng-click='newTournament()') Nuevo torneo
+                            button#btn-new.btn.btn-info.center-block(type='button', ng-click='newTournament()') Nuevo torneo
+                br
                 div(collapse='!alertVisible')
                     alert#alertPanel(type='lastMessage.type', close='alertVisible=false') {{lastMessage.text}}

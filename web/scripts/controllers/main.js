@@ -182,7 +182,7 @@ appModule.controller("MainCtrl",
                                    //store the reference to the result, so futures updates to the results object are automatically loaded into the template
                                    SharedProperties.getTournamentDataSrv().matches[match].result = SharedProperties.getResultsSrv()[match];
                                }
-                               $scope.createGroups();
+                               $scope.createGroups();       //TODO pasar al servicio
                                $scope.groups = SharedProperties.getGroups();
                            },
                            function(errMsg) //error callback
@@ -192,10 +192,8 @@ appModule.controller("MainCtrl",
                 );
 
 
-                //TODO: store and retrieve colors in Server
-
                 // this is the right location for the following block to make it run in parallel with the Results retrieval from the server
-                $scope.tournamentDataSrv = SharedProperties.getTournamentDataSrv();
+                $scope.tournamentDataSrv = SharedProperties.getTournamentDataSrv();   //todo pasar al servicio
                 $scope.addPlayers();
             },
             function(errMsg) //error callback
@@ -409,18 +407,22 @@ appModule.controller("MainCtrl",
         if ($routeParams.tournamentID == "new")
         {
             SharedProperties.setTournamentDataSrv(new Tournament());
+            SharedProperties.getTournamentDataSrv().leftTeamName = "";
+            SharedProperties.getTournamentDataSrv().rightTeamName = "";
+            SharedProperties.getTournamentDataSrv().passKey = $scope.passKey = "";
             SharedProperties.getTournamentDataSrv().gameDate = new Date();
-            SharedProperties.getTournamentDataSrv().matches = [];
-            SharedProperties.setGroups([]);
-            $scope.addGroup(0);
+            SharedProperties.getTournamentDataSrv().matches = [{leftPlayer:"", rightPlayer:"", startTime:SharedProperties.getTournamentDataSrv().gameDate, orderInGroup:0, result:{h:0, r:0, ts:new Date()}}];
 
+            $scope.createGroups();
             $scope.tournamentDataSrv = SharedProperties.getTournamentDataSrv();
             $scope.groups = SharedProperties.getGroups();
         }
         else
+        {
             $scope.loadTournament($routeParams.tournamentID);
+            $scope.passKey = $cookies.passKey;
+        }
 
-        $scope.passKey = $cookies.passKey;
         $scope.setPassKeyHeader();
     }
 
@@ -668,8 +670,9 @@ appModule.controller("MainCtrl",
         return Tournament.get({tournamentID:$routeParams.tournamentID, passKey:passKey}, successFn, errorFn);
     }
 
-    $scope.playTournament = function(passKey)
+    $scope.playTournament = function(passKey, event)
     {
+        var btn = event.srcElement;
         $("#btn-send").button("loading");
 
         $scope.searchTournament(passKey,
@@ -689,22 +692,27 @@ appModule.controller("MainCtrl",
     }
 
 
-    $scope.editTournament = function(passKey)
+    $scope.editTournament = function(passKey, event)
     {
-        $("#btn-edit").button("loading");
+        var btn = $(event.srcElement);
+        btn.button("loading");
+        //$("#btn-edit").button("loading");
 
         $scope.searchTournament(passKey,
                                 function(reply) // success callback
                                 {
-                                    $("#btn-send").button("found");
+                                    btn.button("found");
+                                    //$("#btn-edit").button("found");
                                     $cookies.passKey = $scope.passKey;
                                     window.location = '#/edit/' + reply.id;
                                 },
                                 function(errMsg) //error callback
                                 {
-                                    $("#btn-edit").button("error");
+                                    btn.button("error");
+                                    //$("#btn-edit").button("error");
                                     $scope.displayAlertMessage("danger", errMsg.data.error.message, 0);
-                                    $timeout(function () {$("#btn-send").button("reset")}, 2000);
+                                    $timeout(function () {btn.button("reset")}, 2000);
+                                    //$timeout(function () {$("#btn-edit").button("reset")}, 2000);
                                 }
         );
     }
@@ -843,23 +851,20 @@ appModule.controller("MainCtrl",
 
     $scope.newTournament = function()
     {
-        SharedProperties.setTournamentDataSrv(new Tournament());
-        SharedProperties.getTournamentDataSrv().leftTeamName = "";
-        SharedProperties.getTournamentDataSrv().rightTeamName = "";
-        SharedProperties.getTournamentDataSrv().passKey = $scope.passKey;
-        SharedProperties.getTournamentDataSrv().gameDate = new Date();
-        SharedProperties.getTournamentDataSrv().matches = [{leftPlayer:"", rightPlayer:"", startTime:tournamentDataSrv.gameDate, orderInGroup:0, result:{h:0, h:0, ts:new Date()}}];
+        window.location = '#/edit/new';
 
-        $scope.createGroups();
-        $scope.tournamentDataSrv = SharedProperties.getTournamentDataSrv();
-        $scope.groups = SharedProperties.getGroups();
     }
 
     $scope.putTournament = function()
     {
+        $("#btn-save").button("loading");
+        $scope.alertVisible = false;
         SharedProperties.getTournamentDataSrv().passKey = $scope.passKey; // this is the only property kept on its own $scope variable
+        $cookies.passKey = $scope.passKey;
+        $scope.setPassKeyHeader();
         $scope.propagateDates();
         $scope.createGroups();
+        $scope.groups=SharedProperties.getGroups();
         $scope.reindexGroups();
 
 
@@ -869,15 +874,21 @@ appModule.controller("MainCtrl",
             function(reply)
             {
                 $scope.lastMessage = {type:"success", text:MsgText.SCORE_SENT};
-                //btn.button("sent");
-                //$timeout(function () {btn.button("reset")}, 2000);
-                //$scope.createGroups();
+                $("#btn-save").button("sent");
+                if($routeParams.tournamentID == "new")
+                    $timeout(function () {window.location = "#/edit/" + SharedProperties.getTournamentDataSrv().id}, 1000);
+                else
+                {
+                    $timeout(function () {$("#btn-save").button("reset")}, 2000);
+                    $scope.createGroups();
+                    $scope.groups=SharedProperties.getGroups();
+                }
             },
             function(errMsg) //error callback
             {
                 $scope.displayAlertMessage("danger", errMsg.data.error.message, 0);
-                //btn.button("error");
-                //$timeout(function () {btn.button("reset")}, 2000);
+                $("#btn-save").button("error");
+                $timeout(function () {$("#btn-save").button("reset")}, 2000);
             });
 
 
@@ -936,11 +947,6 @@ appModule.controller("MainCtrl",
             );
     }
 
-
-    $scope.newTournament = function()
-    {
-        window.location = '#/edit/new';
-    }
 
 }]);
 

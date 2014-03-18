@@ -6,7 +6,7 @@
         <h3 class="panel-title">Selección de torneo</h3>
       </div>
       <div class="panel-body">
-        <form id="tournament-form" role="form" ng-submit="playTournament(passKey)">
+        <form id="tournament-form" role="form" ng-submit="playTournament(passKey, $event)">
           <label for="passkey">Palabra clave:</label>
           <input id="passkey" placeholder="palabra clave" type="text" autofocus="true" ng-model="passKey" ng-change="passkeyChange(passKey)" class="form-control"/><br/>
           <div class="row">
@@ -15,14 +15,14 @@
               <div class="visible-xs"><br/></div>
             </div>
             <div class="col-xs-12 col-sm-3">
-              <button id="btn-edit" ng-click="editTournament(passKey)" ng-disabled="!searchTournamentEnabled" data-loading-text="Buscando..." data-found-text="OK!" data-error-text="ERROR :-(" class="btn btn-danger center-block">Editar torneo</button>
+              <button id="btn-edit" type="button" ng-click="editTournament(passKey, $event)" ng-disabled="!searchTournamentEnabled" data-loading-text="Buscando..." data-found-text="OK!" data-error-text="ERROR :-(" class="btn btn-danger center-block">Editar torneo</button>
               <div class="visible-xs"><br/></div>
             </div>
             <div class="col-xs-12 col-sm-3">
-              <button id="btn-new" ng-click="newTournament()" class="btn btn-info center-block">Nuevo torneo</button>
+              <button id="btn-new" type="button" ng-click="newTournament()" class="btn btn-info center-block">Nuevo torneo</button>
             </div>
           </div>
-        </form>
+        </form><br/>
         <div collapse="!alertVisible">
           <alert id="alertPanel" type="lastMessage.type" close="alertVisible=false">{{lastMessage.text}}</alert>
         </div>
