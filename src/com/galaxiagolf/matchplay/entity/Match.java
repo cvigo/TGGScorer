@@ -20,9 +20,7 @@ public class Match
 
     private Date startTime;
     private Integer orderInGroup; // typically 0 or 1, as one group = 2 individual matches
-    private Integer result;
-    private Integer hole;
-    private Date timestamp;
+    private SimpleResult result;
     private String resultURI;
 
     private String passKey;
@@ -35,15 +33,13 @@ public class Match
                 ", rightPlayer='" + rightPlayer + '\'' +
                 ", startTime=" + startTime +
                 ", orderInGroup=" + orderInGroup +
-                ", hole=" + hole +
-                ", result=" + result +
                 ", resultURI='" + resultURI + '\'' +
-                ", timestamp=" + timestamp +
+                ", result=" + result +
                 '}';
     }
 
 
-    public Integer getResult()
+    public SimpleResult getResult()
     {
         return result;
     }
@@ -60,19 +56,9 @@ public class Match
     }
 
 
-    public void setResult(Integer result)
+    public void setResult(SimpleResult result)
     {
         this.result = result;
-    }
-
-    public Integer getHole()
-    {
-        return hole;
-    }
-
-    public void setHole(Integer hole)
-    {
-        this.hole = hole;
     }
 
     public Match()
@@ -133,25 +119,22 @@ public class Match
 
     public boolean validateAsNewObject()
     {
+        if (this.getResult()== null)
+        {
+            this.setResult(new SimpleResult(0,0));
+        }
         return (
                 this.getLeftPlayer() != null &&
                 ! this.getLeftPlayer().isEmpty() &&
                 this.getRightPlayer() != null &&
                 ! this.getRightPlayer().isEmpty() &&
                 this.getStartTime() != null &&
-                this.getOrderInGroup() >=0
+                this.getOrderInGroup() >=0 &&
+                this.getResult() != null &&
+                this.getResult().isValid()
         );
     }
 
-    public Date getTimestamp()
-    {
-        return timestamp;
-    }
-
-    public void setTimestamp(Date timestamp)
-    {
-        this.timestamp = timestamp;
-    }
 
     public String getResultURI()
     {
@@ -165,14 +148,17 @@ public class Match
 
     public void updateFrom(Match newData)
     {
+        if (this.getResult()== null)
+            this.setResult(new SimpleResult(0,0));
+
         if (newData.getLeftPlayer() != null && !newData.getLeftPlayer().isEmpty()) setLeftPlayer(newData.getLeftPlayer());
         if (newData.getRightPlayer() != null && !newData.getRightPlayer().isEmpty()) setRightPlayer(newData.getRightPlayer());
         if (newData.getStartTime() != null) setStartTime(newData.getStartTime());
         if (newData.getOrderInGroup() != null) setOrderInGroup(newData.getOrderInGroup());
-        if (newData.getHole() != null) setHole(newData.getHole());
-        if (newData.getResult() != null) setResult(newData.getResult());
-        setTimestamp(new Date());
+        if (newData.getResult() != null && newData.getResult().isValid()) setResult(newData.getResult());
+        if (newData.getPassKey() != null && !newData.getPassKey().isEmpty() ) setPassKey(newData.getPassKey());
 
+        getResult().setTs(new Date());
     }
 
     public Match clean()

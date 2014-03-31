@@ -1,0 +1,99 @@
+div(ng-init='initModel()', xmlns='http://www.w3.org/1999/html')
+    #scorerpanel.container.galaxia-background
+        // Teams header projected result
+        #header.container
+            // Tablet and Desktop design
+            .hidden-xs.row
+                .col-sm-11
+                    h3.row
+                        .col-sm-4
+                            .row.text-center.scorerpanel {{tournamentDataSrv.leftTeamName}}
+                        .col-sm-2
+                            .text-center.scorerpanel(ng-class="tournamentDataSrv.leftTeamName") {{projectedResult().scoreL}}
+                        .col-sm-2
+                            .text-center.scorerpanel(ng-class="tournamentDataSrv.rightTeamName") {{projectedResult().scoreR}}
+                        .col-sm-4
+                            .row.text-center.scorerpanel {{tournamentDataSrv.rightTeamName}}
+                .col-sm-1
+                    h3.btn.btn-primary(ng-click='reloadResults()')
+                        span.glyphicon.glyphicon-refresh(ng-class="refreshing")
+            // Mobile design
+            .visible-xs.row.scorerpanel
+                .col-xs-10
+                    .row
+                        .col-xs-8.text-left
+                            strong {{tournamentDataSrv.leftTeamName}}
+                        .col-xs-4.text-center(ng-class="tournamentDataSrv.leftTeamName")
+                            strong {{projectedResult().scoreL}}
+                        .col-xs-8.text-left
+                            strong {{tournamentDataSrv.rightTeamName}}
+                        .col-xs-4.text-center(ng-class="tournamentDataSrv.rightTeamName")
+                            strong {{projectedResult().scoreR}}
+                .col-xs-2
+                    .row
+                        .pull-right.btn.btn-primary.button-refresh(ng-click='reloadResults()')
+                            span.glyphicon.glyphicon-refresh(ng-class="refreshing")
+        // individual results
+        #results.container
+            div.my-repeat-animation(ng-repeat='group in groups | filter:playerFilter')
+                div.row.my-repeat-animation(ng-repeat='match in group.matches')
+                    // Tablet and Desktop design
+                    div.hidden-xs.score-update-animation(id="match_desktop_{{match.id}}")
+                        #leftside.col-sm-5
+                            //.row.scorerpanel(ng-class='{getLeadingTeamName(match):true, neutral:match.result.r >= 0}')
+                            .row.scorerpanel(ng-class='{neutral:match.result.r >= 0}', class="{{getLeadingTeamName(match)}}")
+                                .col-sm-4.text-center
+                                    div(ng-show='match.result.r<=0') {{match | prettyresultShort}}
+                                .col-sm-8.text-right(ng-class='{neutral:match.result.r>=0}') {{match.leftPlayer}}
+                        #holetablet.col-sm-1
+                            .scorerpanel.neutral.text-center {{match | prettyholeShort}}
+                        #rightside.col-sm-5
+                            //.row.scorerpanel(ng-class="{getLeadingTeamName(match):true, neutral:match.result.r <= 0}")
+                            .row.scorerpanel(ng-class="{neutral:match.result.r <= 0}", class="{{getLeadingTeamName(match)}}")
+                                .col-sm-8.text-left {{match.rightPlayer}}
+                                .col-sm-4.text-center
+                                    div(ng-show='match.result.r>=0') {{match | prettyresultShort}}
+                        #lastupdate.col-sm-1
+                            .scorerpanel.text-center.neutral
+                                small {{match.result.ts | elapsedMM}}
+                    // Mobile design
+                    div.visible-xs.score-update-animation(id="match_mobile_{{match.id}}")
+                        #playersside.col-xs-5
+                            .row.scorerpanel
+                                .col-xs-12.text-left.neutral {{match.leftPlayer}}
+                                .col-xs-12.text-left.neutral {{match.rightPlayer}}
+                        #result.col-xs-5
+                            .scorerpanel.text-center(ng-class="getLeadingTeamName(match)")
+                                div(ng-show='match.result.r < 0') {{match.leftPlayer}}
+                                div(ng-show='match.result.r > 0') {{match.rightPlayer}}
+                                div(ng-show='match.result.r == 0') All Square
+                                | {{match | prettyresultShort}}
+                        #holemobile.col-xs-2
+                            .row.scorerpanel.neutral.text-center.holemobile {{match | prettyholeShort}}
+        // Teams footer final result
+        #footer.container
+            // Tablet and Desktop design
+            .hidden-xs.row
+                .col-sm-11
+                    h3.row
+                        .col-sm-4
+                            .row.text-center.scorerpanel {{tournamentDataSrv.leftTeamName}}
+                        .col-sm-2
+                            .text-center.scorerpanel(ng-class="tournamentDataSrv.leftTeamName") {{finalResult().scoreL}}
+                        .col-sm-2
+                            .text-center.scorerpanel(ng-class="tournamentDataSrv.rightTeamName") {{finalResult().scoreR}}
+                        .col-sm-4
+                            .row.text-center.scorerpanel {{tournamentDataSrv.rightTeamName}}
+                .col-sm-1
+                    h3.btn.btn-primary(ng-click='reloadResults()')
+                        span.glyphicon.glyphicon-refresh(ng-class="refreshing")
+            // Mobile design
+            .row.scorerpanel.visible-xs
+                .col-xs-8.text-left
+                    strong {{tournamentDataSrv.leftTeamName}}
+                .col-xs-4.text-center(ng-class="tournamentDataSrv.leftTeamName")
+                    strong {{finalResult().scoreL}}
+                .col-xs-8.text-left
+                    strong {{tournamentDataSrv.rightTeamName}}
+                .col-xs-4.text-center(ng-class="tournamentDataSrv.rightTeamName")
+                    strong {{finalResult().scoreR}}

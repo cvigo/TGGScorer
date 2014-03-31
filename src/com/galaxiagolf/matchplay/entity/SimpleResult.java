@@ -1,5 +1,7 @@
 package com.galaxiagolf.matchplay.entity;
 
+import com.googlecode.objectify.annotation.Embed;
+
 import java.util.Date;
 
 /**
@@ -9,6 +11,7 @@ import java.util.Date;
  * Time: 08:45
  * To change this template use File | Settings | File Templates.
  */
+@Embed
 public class SimpleResult
 {
     private Long id; // match id
@@ -26,6 +29,11 @@ public class SimpleResult
 
     public SimpleResult()
     {
+    }
+
+    public SimpleResult(Integer hole, Integer result)
+    {
+        this.setR(result); this.setH(hole); this.setTs(new Date());
     }
 
     public Long getId()
@@ -53,20 +61,21 @@ public class SimpleResult
         return ts;
     }
 
-    void setH(Integer h)
+    public void setH(Integer h)
     {
         this.h = h;
     }
 
-    void setR(Integer r)
+    public void setR(Integer r)
     {
         this.r = r;
     }
 
-    void setTs(Date ts)
+    public void setTs(Date ts)
     {
         this.ts = ts;
     }
+
 
     @Override public String toString()
     {
@@ -78,9 +87,22 @@ public class SimpleResult
                 '}';
     }
 
+    public boolean isValid()
+    {
+        try
+        {
+            validate();
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+        return true;
+
+    }
     public void validate() throws Exception
     {
-        if (this.getH() == null || this.getH()==null)
+        if (this.getH()==null || this.getH()==null)
             throw new Exception("do not send empty results!!");
 
         int remaining = 18-this.getH().intValue();

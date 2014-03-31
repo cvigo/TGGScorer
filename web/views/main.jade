@@ -1,0 +1,47 @@
+div(ng-init='initModel()', xmlns='http://www.w3.org/1999/html')
+    nav.navbar.navbar-fixed-top.background-white(role='navigation')
+        div.container-fluid
+            div.row
+                div.col-xs-2
+                    button.btn.btn-sm.btn-default.navbar-text(ng-click='reloadResults()')
+                        span.glyphicon.glyphicon-refresh(ng-class="refreshing")
+                div.col-xs-10.col-sm-5
+                    div.input-group.navbar-text
+                        input.form-control.input-sm.search-query(type='search', placeholder='Filtro por nick', ng-model='playerFilter', typeahead='player for player in playerList | filter:$viewValue')
+                        span.input-group-addon(ng-click='playerFilter=\'\'')
+                            span.glyphicon.glyphicon-remove
+            div.row
+                div(collapse='!alertVisible')
+                    alert#alertPanel(type='lastMessage.type', close='alertVisible=false') {{lastMessage.text}}
+    div.container-fluid(style='padding-top: 65px;')
+        div.col-xs-12.col-sm-6.col-md-4.col-lg-3.my-repeat-animation(ng-repeat='group in groups | filter:playerFilter')
+            div.panel.panel-info
+                div#matchgroup.panel-heading.matches-heading
+                    div.panel-title
+                        div.row
+                            div.col-xs-7
+                                div.text-left {{group.startTime | date:"HH:mm"}}
+                            div.col-xs-5
+                                button.btn-block.btn.btn-sm.btn-primary(data-loading-text='Enviando...', data-sent-text='Enviado!', data-error-text='ERROR :-(', ng-click='sendResult(group.number, $event)') Enviar!
+                div.panel-body
+                    form#formgroup(role='form')
+                        div#match(ng-repeat='match in group.matches')
+                            div.form-group
+                                div.col-xs-6.text-center.scorerpanel(ng-class="tournamentDataSrv.leftTeamName") {{match.leftPlayer}}
+                                div.col-xs-6.text-center.scorerpanel(ng-class="tournamentDataSrv.rightTeamName") {{match.rightPlayer}}
+                                div.input-group
+                                    span.input-group-btn(ng-click='updateHole(match, -1)')
+                                        button.btn.btn-sm.btn-default(type='button')
+                                            i.glyphicon.glyphicon-chevron-left
+                                    span.form-control.input-sm.text-center {{match | prettyhole}}
+                                    span.input-group-btn(ng-click='updateHole(match, 1)')
+                                        button.btn.btn-sm.btn-default(type='button')
+                                            i.glyphicon.glyphicon-chevron-right
+                                div.input-group
+                                    span.input-group-btn(ng-click='updateMatch(match, -1)')
+                                        button.btn.btn-sm.btn-default(type='button')
+                                            i.glyphicon.glyphicon-chevron-left
+                                    span.form-control.input-sm.nowrap.text-center.team-color-animation(ng-class='getLeadingTeamName(match)') {{match | prettyresult}}
+                                    span.input-group-btn(ng-click='updateMatch(match, 1)')
+                                        button.btn.btn-sm.btn-default(type='button')
+                                            i.glyphicon.glyphicon-chevron-right

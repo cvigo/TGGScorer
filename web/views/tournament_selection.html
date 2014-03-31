@@ -1,27 +1,32 @@
-<div xmlns="http://www.w3.org/1999/html">
-    <div class="container">
-        <br>
-        <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Selección de torneo</h3>
-                </div>
-                <div class="panel-body">
-                    <form id="tournament-form" role="form" ng-submit="searchTournament(passKey)">
-                        <div class="form-group">
-                            <label for="passkey">Palabra clave:</label>
-                            <input id="passkey" class="form-control" placeholder="palabra clave" type="text" autofocus="true" ng-model="passKey" ng-change="passkeyChange(passKey)">
-                            <br>
-                            <button type="submit" id="btn-send" class="btn btn-primary" ng-disabled="!searchTournamentEnabled" data-loading-text="Buscando..." data-found-text="OK!" data-error-text="ERROR :-(">Enviar</button>
-                        </div>
-                    </form>
-                    <div class="my-repeat-animation"  ng-show="alertVisible">
-                        <div id="alertPanel" class="alert alert-dismissable alert-{{lastMessage.type}} fade in text-center">
-                            <button type="button" class="close" aria-hidden="true" ng-click="alertVisible=false">×</button>
-                            {{lastMessage.text}}
-                        </div>
-                    </div>
 
-                </div>
+<div xmlns="http://www.w3.org/1999/html">
+  <div class="container"><br/>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Selección de torneo</h3>
+      </div>
+      <div class="panel-body">
+        <form id="tournament-form" role="form" ng-submit="playTournament(passKey, $event)">
+          <label for="passkey">Palabra clave:</label>
+          <input id="passkey" placeholder="palabra clave" type="text" autofocus="true" ng-model="passKey" ng-change="passkeyChange(passKey)" class="form-control"/><br/>
+          <div class="row">
+            <div class="col-xs-12 col-sm-3">
+              <button id="btn-send" type="submit" ng-disabled="!searchTournamentEnabled" data-loading-text="Buscando..." data-found-text="OK!" data-error-text="ERROR :-(" class="btn btn-primary center-block">Introducir resultados</button>
+              <div class="visible-xs"><br/></div>
             </div>
+            <div class="col-xs-12 col-sm-3">
+              <button id="btn-edit" type="button" ng-click="editTournament(passKey, $event)" ng-disabled="!searchTournamentEnabled" data-loading-text="Buscando..." data-found-text="OK!" data-error-text="ERROR :-(" class="btn btn-danger center-block">Editar torneo</button>
+              <div class="visible-xs"><br/></div>
+            </div>
+            <div class="col-xs-12 col-sm-3">
+              <button id="btn-new" type="button" ng-click="newTournament()" class="btn btn-info center-block">Nuevo torneo</button>
+            </div>
+          </div>
+        </form><br/>
+        <div collapse="!alertVisible">
+          <alert id="alertPanel" type="lastMessage.type" close="alertVisible=false">{{lastMessage.text}}</alert>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
