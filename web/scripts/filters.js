@@ -70,15 +70,6 @@ angularFilters.filter('prettyholeShort', function()
     }
 });
 
-angularFilters.filter('startTimeHHMM', function()
-{
-    return function(timestamp)
-    {
-        return (timestamp).toLocaleTimeString().substr(0,5);
-    }
-
-});
-
 angularFilters.filter('elapsedMM', function()
 {
     return function(timestamp)

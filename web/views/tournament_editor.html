@@ -1,0 +1,121 @@
+
+<div ng-init="initModel()" xmlns="http://www.w3.org/1999/html">
+  <nav role="navigation" class="navbar navbar-fixed-top background-white">
+    <div class="container-fluid">
+      <div class="col-xs-12 col-sm-8">
+        <div collapse="!alertVisible">
+          <alert id="alertPanel" type="lastMessage.type" close="alertVisible=false">{{lastMessage.text}}</alert>
+        </div>
+      </div>
+      <div class="col-xs-12 col-sm-4">
+        <button id="btn-save" form="tournament-form" type="submit" data-loading-text="Grabando..." data-found-text="Grabado!" data-error-text="ERROR :-(" class="btn btn-primary btn-sm navbar-text pull-right">Grabar Torneo</button>
+      </div>
+    </div>
+  </nav>
+  <div style="padding-top: 65px;" class="container-fluid">
+    <!-- TODO add error panel-->
+    <form id="tournament-form" role="form" ng-submit="putTournament()" class="form">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Fecha y Equipos</h3>
+          <div class="visible-xs">.xs</div>
+          <div class="visible-sm">.sm</div>
+          <div class="visible-md">.md</div>
+          <div class="visible-lg">.lg</div>
+        </div>
+        <div class="panel-body">
+          <!--The Tournament Header-->
+          <div class="row">
+            <div class="col-xs-6">
+              <label for="leftTeam">Equipo izq.</label>
+              <input id="leftTeam" placeholder="Equipo izq." typeahead="team for team in frequentTeams | filter:$viewValue" ng-model="tournamentDataSrv.leftTeamName" ng-required="true" class="text form-control input-sm"/>
+            </div>
+            <div class="col-xs-6">
+              <label for="rightTeam">Equipo dcha.</label>
+              <input id="rightTeam" placeholder="Equipo izq." typeahead="team for team in frequentTeams | filter:$viewValue" ng-model="tournamentDataSrv.rightTeamName" ng-required="true" class="text form-control input-sm"/>
+            </div>
+          </div><br/>
+          <div class="row">
+            <div class="col-xs-6">
+              <label for="tournamentdate">Fecha</label>
+              <div id="tournamentdate" class="input-group input-group-sm">
+                <input type="text" ng-model="tournamentDataSrv.gameDate" ng-required="true" is-open="datePickerOpened" datepicker-popup="dd-MMM-yyyy" datepicker-options="dateOptions" clear-text="Borrar" close-text="Cerrar" current-text="Hoy" toggle-weeks-text="Semanas" class="form-control"/><span class="input-group-btn">
+                  <button type="button" ng-click="openDatePicker($event)" class="btn btn-default"><i class="glyphicon glyphicon-calendar"></i></button></span>
+              </div>
+            </div>
+            <div class="col-xs-6">
+              <label for="passkey">Palabra clave</label>
+              <input id="passkey" type="text" ng-model="passKey" ng-required="true" class="form-control input-sm"/>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- The Matches-->
+      <div ng-repeat="group in groups" class="col-sm-12 col-md-6 my-repeat-animation">
+        <div class="panel panel-default">
+          <!-- Group heading-->
+          <div class="panel-heading">
+            <div class="row">
+              <div class="col-xs-7">
+                <h3 class="panel-title">Grupo {{group.number}} ({{group.startTime | date:"HH:mm"}})</h3>
+              </div>
+              <div class="col-xs-5">
+                <div class="btn-group btn-group-sm pull-right">
+                  <button type="button" ng-click="addGroup($index+1)" class="btn btn-default"><i class="glyphicon glyphicon-plus"></i></button>
+                  <button type="button" ng-click="removeGroup($index)" class="btn btn-default"><i class="glyphicon glyphicon-minus"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Group data-->
+          <div class="panel-body">
+            <!--start time-->
+            <div class="col-xs-12 col-sm-2 col-md-3">
+              <div class="row">
+                <div id="startTime" ng-model="group.startTime">
+                  <timepicker hour-step="1" minute-step="10" show-meridian="false" mousewheel="false"></timepicker>
+                </div>
+              </div>
+            </div>
+            <!--matches-->
+            <div class="col-xs-12 col-sm-10 col-md-9">
+              <div class="row">
+                <div class="col-xs-6 col-sm-4">
+                  <div class="row">
+                    <label for="leftPlayer">{{tournamentDataSrv.leftTeamName}}</label>
+                  </div>
+                </div>
+                <div class="col-xs-6 col-sm-4">
+                  <div class="row">
+                    <label for="rightPlayer">{{tournamentDataSrv.rightTeamName}}</label>
+                  </div>
+                </div>
+              </div>
+              <div ng-repeat="match in group.matches" class="row my-repeat-animation">
+                <div class="col-xs-6 col-sm-4">
+                  <div class="row">
+                    <input id="leftPlayer" ng-class="tournamentDataSrv.leftTeamName" placeholder="Jugador {{tournamentDataSrv.leftTeamName}}" ng-required="true" ng-model="match.leftPlayer" class="text input-sm form-control"/>
+                  </div>
+                </div>
+                <div class="col-xs-6 col-sm-4">
+                  <div class="row">
+                    <input id="rightPlayer" ng-class="tournamentDataSrv.rightTeamName" placeholder="Jugador {{tournamentDataSrv.rightTeamName}}" ng-required="true" ng-model="match.rightPlayer" class="text input-sm form-control"/>
+                  </div>
+                </div>
+                <div class="col-xs-12 col-sm-4">
+                  <div class="row">
+                    <div class="btn-group btn-group-sm">
+                      <button type="button" ng-click="addMatchToGroup($parent.$index, $index+1)" class="btn btn-default"><i class="glyphicon glyphicon-plus"></i></button>
+                      <button type="button" ng-click="removeMatchFromGroup($parent.$index, $index)" class="btn btn-default"><i class="glyphicon glyphicon-minus"></i></button>
+                    </div>
+                  </div>
+                  <div class="visible-xs"><br/></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,5 +1,4 @@
-//var appScorer = angular.module("Scorer", ["ui.bootstrap", "MainViewModule"])
-var appScorer = angular.module("Scorer", ["MainViewModule", "ngRoute", "ngTouch", "ngAnimate"]);
+var appScorer = angular.module("Scorer", ["MainViewModule", "ngRoute", "ngTouch", "ngAnimate", "ui.bootstrap"]);
 
 appScorer.config(function ($routeProvider)
   {
@@ -12,6 +11,11 @@ appScorer.config(function ($routeProvider)
       .when("/scorerView/:tournamentID",
       {
         templateUrl: "views/scorer.html",
+        controller: "MainCtrl"
+      })
+      .when("/edit/:tournamentID",
+      {
+        templateUrl: "views/tournament_editor.html",
         controller: "MainCtrl"
       })
       .otherwise(

@@ -30,10 +30,7 @@ import com.googlecode.objectify.Work;
 import javax.annotation.Nullable;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import static com.galaxiagolf.matchplay.OfyService.ofy;
 
@@ -65,23 +62,26 @@ public class MatchPlayScorer
 
     // Create new tournament method, it does not create any matches
     @ApiMethod(
-            name = "mpscorerapi.createTournament",
+            name = "mpscorerapi.postTournament",
             path = TOURNAMENT_LIST_URI,              // http://server/tournament/1/
             httpMethod = HttpMethod.POST
 //            scopes = {"s0", "s1"},
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public Tournament createTournament(Tournament newTournament) throws BadRequestException
+    public Tournament postTournament(Tournament newTournament) throws ServiceException
     {
         // check data integrity
         if ( !newTournament.validateAsNewObject() )
             throw new BadRequestException("invalid input parameters!" );
 
+        return putTournament(null, null, newTournament);
+/*
         Key<Tournament> ret = ofy().save().entity(newTournament).now();
         newTournament.setId(ret.getId());
 
         return newTournament;
+*/
     }
 
 
@@ -94,13 +94,24 @@ public class MatchPlayScorer
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public Tournament getTournament(@Named (TOURNAMENT_ID_PARAM) Long tournamentId) throws NotFoundException
+    public Tournament getTournament(@Named (TOURNAMENT_ID_PARAM) Long tournamentId, @Named("getResults") @Nullable Boolean getResults) throws NotFoundException
     {
         Tournament tournament =  ofy().load().type(Tournament.class).id(tournamentId).now();
         if (tournament==null)
             throw new NotFoundException("tournament not found");
-        else
-            return tournament.clean();
+
+        if (getResults!= null && getResults == false)
+        {
+            Iterator<Match> matches = tournament.getMatches().iterator();
+            while (matches.hasNext())
+            {
+                Match match = matches.next();
+
+                match.setResult(null);
+                match.setResultURI(TOURNAMENT_LIST_URI + "/" + tournamentId.toString() + "/result/" + match.getId().toString());
+            }
+        }
+        return tournament.clean();
     }
 
     // Find method for a Tournament. Search criteria supported: passKey only
@@ -123,23 +134,86 @@ public class MatchPlayScorer
 
     // Simple update method for a Tournament. It does not update tournament matches, just date and teams
     @ApiMethod(
-            name = "mpscorerapi.updateTournament",
+            name = "mpscorerapi.putTournament",
             path = TOURNAMENT_URI,
             httpMethod = HttpMethod.POST
 //            scopes = {"s0", "s1"},
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public Tournament updateTournament(HttpServletRequest req, @Named(TOURNAMENT_ID_PARAM) Long tournamentId, Tournament newData) throws ServiceException
+    public Tournament putTournament(HttpServletRequest req, @Named(TOURNAMENT_ID_PARAM) Long tournamentId, Tournament newData) throws ServiceException
     {
-        Tournament theTournament = ofy().load().type(Tournament.class).id(tournamentId).now();
-        if (theTournament==null)
-            throw new NotFoundException("tournament not found");
-        checkAccessToken(req, theTournament);
+        Tournament theTournament = null;
+        if (tournamentId==null)
+        {
+            if ( !newData.validateAsNewObject() )
+                throw new BadRequestException("invalid input parameters!" );
+            theTournament = new Tournament();
+        }
+        else
+        {
+            theTournament = ofy().load().type(Tournament.class).id(tournamentId).now();
+            if (theTournament==null)
+                throw new NotFoundException("tournament not found");
+            checkAccessToken(req, theTournament);
+        }
 
         // update only the properties passed in the REST call
         theTournament.updateFrom(newData);
 
+        // Now the matches
+        Iterator<Match> it = newData.getMatchesInternal().iterator();
+        while (it.hasNext())
+        {
+            Match m = it.next();
+            m.setPassKey(newData.getPassKey());
+
+
+            if (m.getId()==null) // new match
+            {
+                if (!m.validateAsNewObject())
+                    throw new BadRequestException("Match id=" + m.getId() + " is not well formed");
+
+                Key<Match> matchKey = ofy().save().entity(m).now();
+                theTournament.addMatch(matchKey);
+            }
+            else // existing match
+            {
+                Match match = ofy().load().type(Match.class).id(m.getId()).now();
+                checkAccessToken(req, match);
+                if (match == null)
+                    throw new BadRequestException("Match id=" + m.getId() + " not found in database. Please send an empty ID if you want to create a new Match");
+
+                match.updateFrom(m);
+                match.setPassKey(newData.getPassKey());
+                ofy().save().entity(match).now();
+            }
+        }
+
+        // delete matches that didn't come in the PUT payload
+        Iterator<Ref<Match>> it2 = theTournament.getMatchRefs().iterator();
+        List<Ref<Match>> toKeep = new ArrayList<>();
+        while ( it2.hasNext() )
+        {
+            boolean found = false;
+            Ref<Match> m = it2.next();
+            Long mId = m.getKey().getId(); // to avoid java.util.ConcurrentModificationException
+            it = newData.getMatchesInternal().iterator();
+
+            // not using .contains(Object o) to avoid indentifying changed items as deleted items.
+            while ( it.hasNext() )
+            {
+                if (found = (it.next().getId() == m.getKey().getId()))
+                    break;
+            }
+
+            if (found)
+                toKeep.add(m);
+            else
+                ofy().delete().type(Match.class).id(mId).now();
+        }
+
+        theTournament.setMatchRefs(toKeep);
         ofy().save().entity(theTournament).now();
         return theTournament.clean();
     }
@@ -178,7 +252,7 @@ public class MatchPlayScorer
 
                     try{checkAccessToken(req, theTournament);} catch (Exception e){throw new RuntimeException(e);}
 
-                    List<Ref<Match>> matches = theTournament.getMatchKeys();
+                    List<Ref<Match>> matches = theTournament.getMatchRefs();
 
                     //Datastore transactions are limited to 5 entity groups
                     if (matches.size() > 4)
@@ -196,20 +270,20 @@ public class MatchPlayScorer
 
     // Add match method, for an existing tournament
     @ApiMethod(
-            name = "mpscorerapi.addMatch",
+            name = "mpscorerapi.postMatch",
             path = MATCH_LIST_URI,
             httpMethod = HttpMethod.POST
 //            scopes = {"s0", "s1"},
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public Tournament addMatch(final HttpServletRequest req, @Named(TOURNAMENT_ID_PARAM) final Long tournamentId, final Match newMatch) throws ServiceException
+    public Tournament postMatch(final HttpServletRequest req, @Named(TOURNAMENT_ID_PARAM) final Long tournamentId, final Match newMatch) throws ServiceException
     {
         // check data integrity
         if ( !newMatch.validateAsNewObject() )
             throw new BadRequestException("invalid input parameters!" );
 
-        newMatch.setTimestamp(new Date());
+        newMatch.getResult().setTs(new Date());
 
         // will make a few writes, so let's use a transaction for data integrity
         Tournament th = ofy().transact(new Work<Tournament>()
@@ -290,14 +364,14 @@ public class MatchPlayScorer
 
     // Updates the match data
     @ApiMethod(
-            name = "mpscorerapi.updateMatch",
+            name = "mpscorerapi.putMatch",
             path = MATCH_URI,           // http://server/tournament/1/match/2
             httpMethod = HttpMethod.POST
 //            scopes = {"s0", "s1"},
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public Match updateMatch(HttpServletRequest req, @Named(TOURNAMENT_ID_PARAM) Long tournamentId, @Named(MATCH_ID_PARAM) Long matchId, Match newData) throws ServiceException
+    public Match putMatch(HttpServletRequest req, @Named(TOURNAMENT_ID_PARAM) Long tournamentId, @Named(MATCH_ID_PARAM) Long matchId, Match newData) throws ServiceException
     {
 
         Match match = ofy().load().type(Match.class).id(matchId).now();
@@ -338,9 +412,7 @@ public class MatchPlayScorer
         {
             Match match = matches.next();
 
-            match.setHole(null);
             match.setResult(null);
-            match.setTimestamp(null);
             match.setResultURI(TOURNAMENT_LIST_URI + "/" + tournamentId.toString() + "/result/" + match.getId().toString());
         }
         return tournament.clean();
@@ -368,7 +440,7 @@ public class MatchPlayScorer
         while (matches.hasNext())
         {
             Match match = matches.next();
-            ret.add(new SimpleResult(match.getId(), match.getHole(), match.getResult(), match.getTimestamp()));
+            ret.add(match.getResult());
         }
 
         return ret;
@@ -391,21 +463,21 @@ public class MatchPlayScorer
         if (match==null)
             throw new NotFoundException("match not found");
 
-        return new SimpleResult(match.getId(), match.getHole(), match.getResult(), match.getTimestamp());
+        return match.getResult();
     }
 
 
     // Updates the match result only. This is used by the players when they press the "send result" button from their mobiles
     // so we do not return anything to save bandwidth. Match ID in the payload and Timestamp are ignored if sent by the client.
     @ApiMethod(
-            name = "mpscorerapi.updateMatchResult",
+            name = "mpscorerapi.postMatchResult",
             path = RESULT_URI,
             httpMethod = HttpMethod.POST
 //            scopes = {"s0", "s1"},
 //            audiences = {"a0", "a1"},
 //            clientIds = {"c0", "c1"}
     )
-    public void updateMatchResult(HttpServletRequest req, @Named(TOURNAMENT_ID_PARAM) Long tournamentId, @Named(MATCH_ID_PARAM) Long matchId, SimpleResult newData) throws ServiceException
+    public void postMatchResult(HttpServletRequest req, @Named(TOURNAMENT_ID_PARAM) Long tournamentId, @Named(MATCH_ID_PARAM) Long matchId, SimpleResult newData) throws ServiceException
     {
         try
         {
@@ -422,11 +494,10 @@ public class MatchPlayScorer
             throw new NotFoundException("match not found");
         checkAccessToken(req, match);
 
-        if ( match.getHole() != newData.getH() || match.getResult() != newData.getR() )
+        if ( match.getResult().getH() != newData.getH() || match.getResult().getR() != newData.getR() )
         {
-            match.setHole(newData.getH());
-            match.setResult(newData.getR());
-            match.setTimestamp(new Date());  // get current timestamp
+            match.setResult(newData);
+            match.getResult().setTs(new Date());  // get current timestamp
 
             ofy().save().entity(match).now();
         }

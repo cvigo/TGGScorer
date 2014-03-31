@@ -16,17 +16,20 @@ import java.util.List;
  * User: carlosvigo
  * Date: 04/06/13
  * Time: 01:04
- * Need to create a POJO class for Tournament, as AppEngine endpoints cannot serialize Objectify types (Key, Ref, etc.)
  */
 
 @Entity
 @Cache
 public class Tournament
 {
-    @Id private Long id;
+    @Id
+    private Long id;
 
     @Load(unless=NoResults.class)
     private List<Ref<Match>> matches;
+
+    @Ignore
+    private List<Match> matchesInternal; // this will store the matches deserialised from JSON input messages, it won't be used for actual data storing
 
     private Date gameDate;
     private String leftTeamName;
@@ -105,7 +108,7 @@ public class Tournament
     {
         return "Tournament{" +
                 "id=" + id +
-                ", matches=" + getMatches() +
+                ", matches=" + getMatchesInternal() +
                 '}';
     }
 
@@ -121,9 +124,16 @@ public class Tournament
     }
 
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    public List<Ref<Match>> getMatchKeys()
+    public List<Ref<Match>> getMatchRefs()
     {
         return matches;
+    }
+
+    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
+    public void setMatchRefs(List<Ref<Match>> refs)
+    {
+        matches.clear();
+        matches = refs;
     }
 
     public List<Match> getMatches()
@@ -133,12 +143,23 @@ public class Tournament
         while (it.hasNext())
         {
             Ref<Match> m = it.next();
-            if ( m.isLoaded() )
+            if ( m.isLoaded() && m.getValue() != null )
                 ret.add(m.getValue().clean());
         }
 
         return ret;
 
+    }
+
+    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
+    public List<Match> getMatchesInternal()
+    {
+        return matchesInternal;
+    }
+
+    public void setMatches(List<Match> matches)     // only used to deserialize JSON input messages, it won't be used for actual data storing
+    {
+        this.matchesInternal = matches;
     }
 
 
