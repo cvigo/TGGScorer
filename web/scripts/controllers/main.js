@@ -5,19 +5,25 @@ var MsgText =
     READY :"Preparado",
     WORKING:"Preparado",
     SCORE_SENT:"Marcador enviado!",
-    GAMEOVER:"El partido tendría que haber acabado ya!!"
-};
+    GAMEOVER:"El partido tendría que haber acabado ya!!",
 
-var alertTimeout = 3000;
+    LOADING:"Cargando resultados...",
+    NO_UPDATES:"... No hay nuevos resultados",
+    NEW_RESULTS:"... se han recibido nuevos resultados"
+};
 
 
 var appModule = angular.module("MainViewModule", ["BackendModule", "ScorerFilters", "ngCookies", "SharedData"]);
+
+var errorMsgTime = 2000;
+var animationTime = 1000;
 
 appModule.controller("MainCtrl",
                      ["$scope",
                          "$routeParams",
                          "$window",
                          "$timeout",
+                         "$interval",
                          "$animate",
                          "$cookies",
                          "$http",
@@ -29,6 +35,7 @@ appModule.controller("MainCtrl",
                              $routeParams,
                              $window,
                              $timeout,
+                             $interval,
                              $animate,
                              $cookies,
                              $http,
@@ -37,6 +44,13 @@ appModule.controller("MainCtrl",
                              SharedProperties
                          )
 {
+    var alertTimeout = 3000;
+    var refreshInterval = 10000;
+    var autoRefresh;
+    var autoRefreshTimer;
+
+    $scope.nextRefresh = refreshInterval/1000;
+
     //data properties
     $scope.tournamentDataSrv = SharedProperties.getTournamentDataSrv(); // this will store the tournament data retrieved from the server
     $scope.resultsSrv = SharedProperties.getResultsSrv(); // this will store de results received from the server
@@ -164,6 +178,7 @@ appModule.controller("MainCtrl",
  */
     $scope.loadTournament = function(tournamentId)
     {
+        $scope.refreshStatus = MsgText.LOADING;
         SharedProperties.setTournamentDataSrv(Tournament.get({tournamentID:tournamentId, getResults:false},
             function(tournamentData)
             {
@@ -184,6 +199,9 @@ appModule.controller("MainCtrl",
                                }
                                $scope.createGroups();       //TODO pasar al servicio
                                $scope.groups = SharedProperties.getGroups();
+
+                               $scope.scheduleAutoRefresh();
+                               $scope.refreshStatus = " ";
                            },
                            function(errMsg) //error callback
                            {
@@ -213,28 +231,33 @@ appModule.controller("MainCtrl",
     $scope.reloadResults = function()
     {
         $scope.refreshing = "rotating"; // this applies "rotating" class to the refresh button
+        $scope.refreshStatus = MsgText.LOADING;
+        var anyUpdate = false;
 
         Result.get({tournamentID:$routeParams.tournamentID},
             function(resultsArray)  // success callback
             {
+                $scope.refreshStatus = MsgText.NO_UPDATES;
                 $scope.refreshing = "null";
+                $scope.scheduleAutoRefresh();
                 angular.forEach(resultsArray.items, function (result, index)
                 {
                     //we can trust TS, as the server does not write POSTs that do not actually send a different hole or result than the ones already stored
-                    // this if is just used to trigger or not trigger the annimations in the scorer screen. Results are always reloaded
+                    // this if is just used to trigger or not trigger the animations in the scorer screen. Results are always reloaded
                     if ( (SharedProperties.getResultsSrv()[index].ts == null && result.ts != null) || SharedProperties.getResultsSrv()[index].ts < result.ts) //TS
                     {
+                        $scope.refreshStatus = MsgText.NEW_RESULTS;
                         $scope.markAsChanged(SharedProperties.getResultsSrv()[index].id);
 
                         $timeout(function () // give some time to the animations before updating the numbers
                                  {
-                                     //SharedProperties.getResultsSrv() = resultsArray.items; // Don't do this, because SharedProperties.getResultsSrv() would the copied
+                                     //SharedProperties.getResultsSrv() = resultsArray.items; // Don't do this, because SharedProperties.getResultsSrv() would be copied
                                      //a new array instance, and references to results in SharedProperties.getTournamentDataSrv(). would be lost
                                      SharedProperties.getResultsSrv()[index].r = result.r; // this also makes SharedProperties.getTournamentDataSrv().matches[index].result.r = result.r etc...
                                      SharedProperties.getResultsSrv()[index].h = result.h;
                                      SharedProperties.getResultsSrv()[index].ts = result.ts;
                                  },
-                                 2000
+                                 animationTime
                         );
                     }
                     else
@@ -243,6 +266,7 @@ appModule.controller("MainCtrl",
                         SharedProperties.getResultsSrv()[index].r = result.r;
                         SharedProperties.getResultsSrv()[index].h = result.h;
                         SharedProperties.getResultsSrv()[index].ts = result.ts;
+                        $scope.markAsUnchanged(SharedProperties.getResultsSrv()[index].id);
                     }
 
                 });
@@ -250,7 +274,10 @@ appModule.controller("MainCtrl",
             function(errMsg) //error callback
             {
                 $scope.refreshing = "null";
+                $scope.refreshStatus = " ";
                 $scope.displayAlertMessage("danger", errMsg.data.error.message, 0);
+                $scope.scheduleAutoRefresh();
+
             }
 
         );
@@ -275,16 +302,22 @@ appModule.controller("MainCtrl",
                      $("#match_desktop_"+matchId).addClass("ng-hide-remove");
                      $("#match_mobile_"+matchId).removeClass("ng-hide-add");
                      $("#match_mobile_"+matchId).addClass("ng-hide-remove");
+                     $("#match_desktop_"+matchId+"_lastupdate").addClass("blinking");
                      $timeout(function()
                               {
                                   $("#match_desktop_"+matchId).removeClass("ng-hide-remove");
                                   $("#match_mobile_"+matchId).removeClass("ng-hide-remove");
                               },
-                              2000
+                              animationTime
                      );
                  },
-                 2000
+                 animationTime
         );
+    }
+
+    $scope.markAsUnchanged = function(matchId)
+    {
+        $("#match_desktop_"+matchId+"_lastupdate").removeClass("blinking");
     }
 
     /**
@@ -299,7 +332,7 @@ appModule.controller("MainCtrl",
      */
     $scope.sendResult = function(groupNumber, event)
     {
-        var btn = $(event.srcElement);
+        var btn = $(event.target);
         btn.button("loading");
 
         // GAE endpoints not returning arrays whey they should, really sucks. This crappy code is caused by GAE
@@ -317,13 +350,13 @@ appModule.controller("MainCtrl",
                 {
                     $scope.lastMessage = {type:"success", text:MsgText.SCORE_SENT};
                     btn.button("sent");
-                    $timeout(function () {btn.button("reset")}, 2000);
+                    $timeout(function () {btn.button("reset")}, errorMsgTime);
                 },
                 function(errMsg) //error callback
                 {
                     $scope.displayAlertMessage("danger", errMsg.data.error.message, 0);
                     btn.button("error");
-                    $timeout(function () {btn.button("reset")}, 2000);
+                    $timeout(function () {btn.button("reset")}, errorMsgTime);
                 });
         }
     }
@@ -402,7 +435,7 @@ appModule.controller("MainCtrl",
  * @description
  * prepares de scorer model, getting data from the server, preparing the groups and the list of players for the filter
  */
-    $scope.initModel = function()
+    $scope.initModel = function(autorefresh)
     {
         if ($routeParams.tournamentID == "new")
         {
@@ -424,6 +457,8 @@ appModule.controller("MainCtrl",
         }
 
         $scope.setPassKeyHeader();
+
+        $scope.doAutoRefresh = autorefresh;
     }
 
 
@@ -672,7 +707,6 @@ appModule.controller("MainCtrl",
 
     $scope.playTournament = function(passKey, event)
     {
-        var btn = event.srcElement;
         $("#btn-send").button("loading");
 
         $scope.searchTournament(passKey,
@@ -686,7 +720,7 @@ appModule.controller("MainCtrl",
                                 {
                                     $("#btn-send").button("error");
                                     $scope.displayAlertMessage("danger", errMsg.data.error.message, 0);
-                                    $timeout(function () {$("#btn-send").button("reset")}, 2000);
+                                    $timeout(function () {$("#btn-send").button("reset")}, errorMsgTime);
                                 }
         );
     }
@@ -694,25 +728,21 @@ appModule.controller("MainCtrl",
 
     $scope.editTournament = function(passKey, event)
     {
-        var btn = $(event.srcElement);
+        var btn = $(event.target);
         btn.button("loading");
-        //$("#btn-edit").button("loading");
 
         $scope.searchTournament(passKey,
                                 function(reply) // success callback
                                 {
                                     btn.button("found");
-                                    //$("#btn-edit").button("found");
                                     $cookies.passKey = $scope.passKey;
                                     window.location = '#/edit/' + reply.id;
                                 },
                                 function(errMsg) //error callback
                                 {
                                     btn.button("error");
-                                    //$("#btn-edit").button("error");
                                     $scope.displayAlertMessage("danger", errMsg.data.error.message, 0);
-                                    $timeout(function () {btn.button("reset")}, 2000);
-                                    //$timeout(function () {$("#btn-edit").button("reset")}, 2000);
+                                    $timeout(function () {btn.button("reset")}, errorMsgTime);
                                 }
         );
     }
@@ -730,7 +760,6 @@ appModule.controller("MainCtrl",
     $scope.passkeyChange = function(passKey)
     {
         $scope.alertVisible = false;
-        //$("#btn-send").button("reset");
         $scope.searchTournamentEnabled = passKey.length > 3;
 
     }
@@ -879,7 +908,7 @@ appModule.controller("MainCtrl",
                     $timeout(function () {window.location = "#/edit/" + SharedProperties.getTournamentDataSrv().id}, 1000);
                 else
                 {
-                    $timeout(function () {$("#btn-save").button("reset")}, 2000);
+                    $timeout(function () {$("#btn-save").button("reset")}, errorMsgTime);
                     $scope.createGroups();
                     $scope.groups=SharedProperties.getGroups();
                 }
@@ -888,7 +917,7 @@ appModule.controller("MainCtrl",
             {
                 $scope.displayAlertMessage("danger", errMsg.data.error.message, 0);
                 $("#btn-save").button("error");
-                $timeout(function () {$("#btn-save").button("reset")}, 2000);
+                $timeout(function () {$("#btn-save").button("reset")}, errorMsgTime);
             });
 
 
@@ -947,6 +976,63 @@ appModule.controller("MainCtrl",
             );
     }
 
+
+    $scope.scheduleAutoRefresh = function()
+    {
+        if ( ! $scope.doAutoRefresh ) return;
+
+        // Don't start a new autorefresh if we are already doing it
+        if ( angular.isDefined(autoRefresh) ) return;
+
+        $scope.restartAutoRefreshTimer();
+        autoRefresh = $timeout(function ()
+                                {
+                                    autoRefresh = undefined;
+                                    $scope.reloadResults();
+                                },
+                                refreshInterval);
+    };
+
+    $scope.restartAutoRefreshTimer = function()
+    {
+        if (angular.isDefined(autoRefreshTimer))
+        {
+            $interval.cancel(autoRefreshTimer);
+            autoRefreshTimer = undefined;
+        }
+        $scope.nextRefresh = refreshInterval/1000;
+        autoRefreshTimer = $interval(function ()
+                                     {
+                                         if ($scope.nextRefresh > 0)
+                                         {
+                                             $scope.nextRefresh--;
+                                         }
+                                         else
+                                             $interval.cancel(autoRefreshTimer);
+                                     },
+                                     1000);
+
+    }
+
+    $scope.stopAutoRefresh = function()
+    {
+        if (angular.isDefined(autoRefresh))
+        {
+            $interval.cancel(autoRefresh);
+            autoRefresh = undefined;
+        }
+        if (angular.isDefined(autoRefreshTimer))
+        {
+            $interval.cancel(autoRefreshTimer);
+            autoRefreshTimer = undefined;
+        }
+    };
+
+    $scope.$on('$destroy', function()
+    {
+        // Make sure that the interval is destroyed too
+        $scope.stopAutoRefresh();
+    });
 
 }]);
 

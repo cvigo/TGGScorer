@@ -726,7 +726,8 @@
       };
 
       // Internal: Updates a traversed object member.
-      update = function(source, property, callback) {
+
+        update = function(source, property, callback) {
         var element = walk(source, property, callback);
         if (element === undef) {
           delete source[property];

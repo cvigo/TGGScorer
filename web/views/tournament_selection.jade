@@ -26,11 +26,11 @@ div(xmlns='http://www.w3.org/1999/html')
                                                                         data-loading-text='Buscando...',
                                                                         data-found-text='OK!',
                                                                         data-error-text='ERROR :-(')
-                                                                        |Editar torneo
+                                                                        |Editar partidas del torneo
                             div.visible-xs
                                 br
                         div.col-xs-12.col-sm-3
-                            button#btn-new.btn.btn-info.center-block(type='button', ng-click='newTournament()') Nuevo torneo
+                            button#btn-new.btn.btn-info.center-block(type='button', ng-click='newTournament()') Crear torneo
                 br
                 div(collapse='!alertVisible')
                     alert#alertPanel(type='lastMessage.type', close='alertVisible=false') {{lastMessage.text}}
