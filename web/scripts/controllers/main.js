@@ -335,7 +335,7 @@ appModule.controller("MainCtrl",
         var btn = $(event.target);
         btn.button("loading");
 
-        // GAE endpoints not returning arrays whey they should, really sucks. This crappy code is caused by GAE
+        // GAE endpoints return arrays inside an "items" property. I cannot just "save" the resource I retrieved in loadTournament
         for (var match in SharedProperties.getGroups()[groupNumber-1].matches)
         {
             // THIS WOULD BE THE IDEAL CASE, BUT... SharedProperties.getGroups()[groupNumber-1].matches[match].result.$save();
