@@ -1,10 +1,14 @@
 div(ng-init='initModel()', xmlns='http://www.w3.org/1999/html')
     nav.navbar.navbar-fixed-top.background-white(role='navigation')
         div.container-fluid
-            div.col-xs-12.col-sm-8
+            div.col-xs-12
                 div(collapse='!alertVisible')
                     alert#alertPanel(type='lastMessage.type', close='alertVisible=false') {{lastMessage.text}}
-            div.col-xs-12.col-sm-4
+            div.col-xs-12
+                a(href="{{scorePanelURL}}", target="_blank", ng-show="tournamentSaved")
+                    button#btn-openscorer.btn.btn-info.btn-sm.navbar-text.pull-right(form="tournament-form",
+                                                                                  type='button')
+                                                                                  |Enlace al marcador
                 button#btn-save.btn.btn-primary.btn-sm.navbar-text.pull-right(form="tournament-form",
                                                                               type='submit'
                                                                               data-loading-text='Grabando...',
@@ -99,3 +103,18 @@ div(ng-init='initModel()', xmlns='http://www.w3.org/1999/html')
                                                 i.glyphicon.glyphicon-minus
                                     div.visible-xs
                                         br
+
+        //span Enlace
+        //
+        //div#errorModal.modal.fade(tabindex="-1", role="dialog", aria-labelledby="errorModalLabel", aria-hidden="true")
+        //    div.modal-dialog.modal-sm
+        //        div.modal-content
+        //            div.modal-header
+        //                button.close(type="button", data-dismiss="modal", aria-hidden="true") &times
+        //                h4#errorModalLabel.modal-title El torneo ha sido creado
+        //            div.modal-body
+        //                p Este es el enlace al panel del marcador
+        //                a(href="{{scorePanelURL}}", target="_blank") {{scorePanelURL}}
+        //            div.modal-footer
+        //                button.btn.btn-default(type="button", data-dismiss="modal") Ok
+        //                button.btn.btn-info(type="button", ng-click="openScorePanel") Abrir en navegador

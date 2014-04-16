@@ -449,11 +449,14 @@ appModule.controller("MainCtrl",
             $scope.createGroups();
             $scope.tournamentDataSrv = SharedProperties.getTournamentDataSrv();
             $scope.groups = SharedProperties.getGroups();
+            $scope.tournamentSaved = false;
         }
         else
         {
             $scope.loadTournament($routeParams.tournamentID);
             $scope.passKey = window.localStorage.getItem("passKey");
+            $scope.scorePanelURL = window.location.protocol + "//" + window.location.host + "/#/scorerView/" + $routeParams.tournamentID;
+            $scope.tournamentSaved = true;
         }
 
         $scope.setPassKeyHeader();
@@ -912,7 +915,12 @@ appModule.controller("MainCtrl",
                 $scope.lastMessage = {type:"success", text:MsgText.SCORE_SENT};
                 $("#btn-save").button("sent");
                 if($routeParams.tournamentID == "new")
-                    $timeout(function () {window.location = "#/edit/" + SharedProperties.getTournamentDataSrv().id}, 1000);
+                {
+                    $timeout(function ()
+                             {
+                                 window.location = "#/edit/" + SharedProperties.getTournamentDataSrv().id;
+                             }, 1000);
+                }
                 else
                 {
                     $timeout(function () {$("#btn-save").button("reset")}, errorMsgTime);

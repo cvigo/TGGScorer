@@ -2,12 +2,13 @@
 <div ng-init="initModel()" xmlns="http://www.w3.org/1999/html">
   <nav role="navigation" class="navbar navbar-fixed-top background-white">
     <div class="container-fluid">
-      <div class="col-xs-12 col-sm-8">
+      <div class="col-xs-12">
         <div collapse="!alertVisible">
           <alert id="alertPanel" type="lastMessage.type" close="alertVisible=false">{{lastMessage.text}}</alert>
         </div>
       </div>
-      <div class="col-xs-12 col-sm-4">
+      <div class="col-xs-12"><a href="{{scorePanelURL}}" target="_blank" ng-show="tournamentSaved">
+          <button id="btn-openscorer" form="tournament-form" type="button" class="btn btn-info btn-sm navbar-text pull-right">Enlace al marcador</button></a>
         <button id="btn-save" form="tournament-form" type="submit" data-loading-text="Grabando..." data-found-text="Grabado!" data-error-text="ERROR :-(" class="btn btn-primary btn-sm navbar-text pull-right">Grabar Torneo</button>
       </div>
     </div>
@@ -117,5 +118,19 @@
         </div>
       </div>
     </form>
+    <!--span Enlace-->
+    <!---->
+    <!--div#errorModal.modal.fade(tabindex="-1", role="dialog", aria-labelledby="errorModalLabel", aria-hidden="true")-->
+    <!--    div.modal-dialog.modal-sm-->
+    <!--        div.modal-content-->
+    <!--            div.modal-header-->
+    <!--                button.close(type="button", data-dismiss="modal", aria-hidden="true") &times-->
+    <!--                h4#errorModalLabel.modal-title El torneo ha sido creado-->
+    <!--            div.modal-body-->
+    <!--                p Este es el enlace al panel del marcador-->
+    <!--                a(href="{{scorePanelURL}}", target="_blank") {{scorePanelURL}}-->
+    <!--            div.modal-footer-->
+    <!--                button.btn.btn-default(type="button", data-dismiss="modal") Ok-->
+    <!--                button.btn.btn-info(type="button", ng-click="openScorePanel") Abrir en navegador-->
   </div>
 </div>
