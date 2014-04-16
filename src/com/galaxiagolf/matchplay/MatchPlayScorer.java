@@ -30,7 +30,10 @@ import com.googlecode.objectify.Work;
 import javax.annotation.Nullable;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 import static com.galaxiagolf.matchplay.OfyService.ofy;
 
@@ -220,12 +223,16 @@ public class MatchPlayScorer
 
     private void checkAccessToken(HttpServletRequest req, Tournament theTournament) throws UnauthorizedException
     {
+        System.out.println("Tournament pass key: " + theTournament.getPassKey());
+        System.out.println("Validating request. x-PassKey=" + req.getHeader("x-PassKey"));
         if ( theTournament.getPassKey() != null && !theTournament.getPassKey().equals(req.getHeader("x-PassKey")) )
             throw new UnauthorizedException("upps... who are you?");
     }
 
     private void checkAccessToken(HttpServletRequest req, Match theMatch) throws UnauthorizedException
     {
+        System.out.println("Match pass key: " + theMatch.getPassKey());
+        System.out.println("Validating request. x-PassKey=" + req.getHeader("x-PassKey"));
         if ( theMatch.getPassKey() != null && !theMatch.getPassKey().equals(req.getHeader("x-PassKey")) )
             throw new UnauthorizedException("upps... who are you?");
     }

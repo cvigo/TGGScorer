@@ -453,7 +453,7 @@ appModule.controller("MainCtrl",
         else
         {
             $scope.loadTournament($routeParams.tournamentID);
-            $scope.passKey = $cookies.passKey;
+            $scope.passKey = window.localStorage.getItem("passKey");
         }
 
         $scope.setPassKeyHeader();
@@ -461,8 +461,15 @@ appModule.controller("MainCtrl",
         $scope.doAutoRefresh = autorefresh;
     }
 
+    $scope.initApp = function()
+    {
+        $scope.passKey = window.localStorage.getItem("passKey");
+        $scope.passkeyChange($scope.passKey);
+    }
 
-/**
+
+
+    /**
  * @ngdoc function
  * @name $scope.allPlayers
  * @function
@@ -713,7 +720,7 @@ appModule.controller("MainCtrl",
                                 function(reply) // success callback
                                 {
                                     $("#btn-send").button("found");
-                                    $cookies.passKey = $scope.passKey;
+                                    window.localStorage.setItem("passKey", $scope.passKey);
                                     window.location = '#/playerView/' + reply.id;
                                 },
                                 function(errMsg) //error callback
@@ -735,7 +742,7 @@ appModule.controller("MainCtrl",
                                 function(reply) // success callback
                                 {
                                     btn.button("found");
-                                    $cookies.passKey = $scope.passKey;
+                                    window.localStorage.setItem("passKey", $scope.passKey);
                                     window.location = '#/edit/' + reply.id;
                                 },
                                 function(errMsg) //error callback
@@ -889,7 +896,7 @@ appModule.controller("MainCtrl",
         $("#btn-save").button("loading");
         $scope.alertVisible = false;
         SharedProperties.getTournamentDataSrv().passKey = $scope.passKey; // this is the only property kept on its own $scope variable
-        $cookies.passKey = $scope.passKey;
+        window.localStorage.setItem("passKey", $scope.passKey);
         $scope.setPassKeyHeader();
         $scope.propagateDates();
         $scope.createGroups();
