@@ -387,17 +387,18 @@
 
 .score-update-animation.ng-hide-add
 {
-    -webkit-animation: flipOutX 2s;
-    -moz-animation: flipOutX 2s;
-    -ms-animation: flipOutX 2s;
-    animation: flipOutX 2s;
+    /*-webkit-animation: flipOutX 2s;*/
+    -webkit-animation: bounceOut 1s;
+    -moz-animation: bounceOut 1s;
+    -ms-animation: bounceOut 1s;
+    animation: bounceOut 1s;
 }
 .score-update-animation.ng-hide-remove
 {
-    -webkit-animation: flipInX 2s;
-    -moz-animation: flipInX 2s;
-    -ms-animation: flipInX 2s;
-    animation: flipInX 2s;
+    -webkit-animation: bounceIn 1s;
+    -moz-animation: bounceIn 1s;
+    -ms-animation: bounceIn 1s;
+    animation: bounceIn 1s;
 }
 
 /* refresh button rotation */
@@ -414,9 +415,20 @@
 .rotating
 {
     -webkit-animation: rotating 2s linear infinite;
+    -moz-animation: rotating 2s linear infinite;
+    -ms-animation: rotating 2s linear infinite;
+    animation: rotating 2s linear infinite;
 }
 
 .navbar.background-white
 {
     background: #ffffff;
+}
+
+.blinking
+{
+    -webkit-animation: pulse 0.5s infinite;
+    -moz-animation: pulse 0.5s infinite;
+    -ms-animation: pulse 0.5s infinite;
+    animation: pulse 0.5s infinite;
 }

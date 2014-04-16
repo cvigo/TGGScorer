@@ -1,7 +1,11 @@
 var appScorer = angular.module("Scorer", ["MainViewModule", "ngRoute", "ngTouch", "ngAnimate", "ui.bootstrap"]);
 
-appScorer.config(function ($routeProvider)
-  {
+
+
+appScorer.config(function ($routeProvider /*, $locationProvider*/)
+{
+    //$locationProvider.html5Mode(true);
+
     $routeProvider
       .when("/playerView/:tournamentID",
       {
@@ -31,6 +35,7 @@ appScorer.config(["$httpProvider", function ($httpProvider) {
         convertDateStringsToDates(responseData);
         return responseData;
     });
+    $httpProvider.defaults.withCredentials = true;
 }]);
 
 var regexIso8601 = /^(\d{4}|\+\d{6})(?:-(\d{2})(?:-(\d{2})(?:T(\d{2}):(\d{2}):(\d{2})\.(\d{1,})(Z|([\-+])(\d{2}):(\d{2}))?)?)?)?$/;

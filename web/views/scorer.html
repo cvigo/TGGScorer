@@ -1,5 +1,5 @@
 
-<div ng-init="initModel()" xmlns="http://www.w3.org/1999/html">
+<div ng-init="initModel(true)" xmlns="http://www.w3.org/1999/html">
   <div id="scorerpanel" class="container galaxia-background">
     <!-- Teams header projected result-->
     <div id="header" class="container">
@@ -22,7 +22,8 @@
           </h3>
         </div>
         <div class="col-sm-1">
-          <h3 ng-click="reloadResults()" class="btn btn-primary"><span ng-class="refreshing" class="glyphicon glyphicon-refresh"></span></h3>
+          <!--h3.btn.btn-primary(ng-click='reloadResults()')-->
+          <!--    span.glyphicon.glyphicon-refresh(ng-class="refreshing")-->
         </div>
       </div>
       <!-- Mobile design-->
@@ -37,7 +38,8 @@
         </div>
         <div class="col-xs-2">
           <div class="row">
-            <div ng-click="reloadResults()" class="pull-right btn btn-primary button-refresh"><span ng-class="refreshing" class="glyphicon glyphicon-refresh"></span></div>
+            <!--.pull-right.btn.btn-primary.button-refresh(ng-click='reloadResults()')-->
+            <!--    span.glyphicon.glyphicon-refresh(ng-class="refreshing")-->
           </div>
         </div>
       </div>
@@ -48,7 +50,7 @@
         <div ng-repeat="match in group.matches" class="row my-repeat-animation">
           <!-- Tablet and Desktop design-->
           <div id="match_desktop_{{match.id}}" class="hidden-xs score-update-animation">
-            <div id="leftside" class="col-sm-5">
+            <div id="match_desktop_{{match.id}}_leftside" class="col-sm-5">
               <!--.row.scorerpanel(ng-class='{getLeadingTeamName(match):true, neutral:match.result.r >= 0}')-->
               <div ng-class="{neutral:match.result.r &gt;= 0}" class="row scorerpanel {{getLeadingTeamName(match)}}">
                 <div class="col-sm-4 text-center">
@@ -57,10 +59,10 @@
                 <div ng-class="{neutral:match.result.r&gt;=0}" class="col-sm-8 text-right">{{match.leftPlayer}}</div>
               </div>
             </div>
-            <div id="holetablet" class="col-sm-1">
+            <div id="match_desktop_{{match.id}}_holetablet" class="col-sm-1">
               <div class="scorerpanel neutral text-center">{{match | prettyholeShort}}</div>
             </div>
-            <div id="rightside" class="col-sm-5">
+            <div id="match_desktop_{{match.id}}_rightside" class="col-sm-5">
               <!--.row.scorerpanel(ng-class="{getLeadingTeamName(match):true, neutral:match.result.r <= 0}")-->
               <div ng-class="{neutral:match.result.r &lt;= 0}" class="row scorerpanel {{getLeadingTeamName(match)}}">
                 <div class="col-sm-8 text-left">{{match.rightPlayer}}</div>
@@ -69,26 +71,26 @@
                 </div>
               </div>
             </div>
-            <div id="lastupdate" class="col-sm-1">
+            <div id="match_desktop_{{match.id}}_lastupdate" class="col-sm-1">
               <div class="scorerpanel text-center neutral"><small>{{match.result.ts | elapsedMM}}</small></div>
             </div>
           </div>
           <!-- Mobile design-->
           <div id="match_mobile_{{match.id}}" class="visible-xs score-update-animation">
-            <div id="playersside" class="col-xs-5">
+            <div id="match_mobile_{{match.id}}_playersside" class="col-xs-5">
               <div class="row scorerpanel">
                 <div class="col-xs-12 text-left neutral">{{match.leftPlayer}}</div>
                 <div class="col-xs-12 text-left neutral">{{match.rightPlayer}}</div>
               </div>
             </div>
-            <div id="result" class="col-xs-5">
+            <div id="match_mobile_{{match.id}}_result" class="col-xs-5">
               <div ng-class="getLeadingTeamName(match)" class="scorerpanel text-center">
                 <div ng-show="match.result.r &lt; 0">{{match.leftPlayer}}</div>
                 <div ng-show="match.result.r &gt; 0">{{match.rightPlayer}}</div>
                 <div ng-show="match.result.r == 0">All Square</div>{{match | prettyresultShort}}
               </div>
             </div>
-            <div id="holemobile" class="col-xs-2">
+            <div id="match_mobile_{{match.id}}_holemobile" class="col-xs-2">
               <div class="row scorerpanel neutral text-center holemobile">{{match | prettyholeShort}}</div>
             </div>
           </div>
@@ -98,33 +100,54 @@
     <!-- Teams footer final result-->
     <div id="footer" class="container">
       <!-- Tablet and Desktop design-->
-      <div class="hidden-xs row">
-        <div class="col-sm-11">
-          <h3 class="row">
-            <div class="col-sm-4">
-              <div class="row text-center scorerpanel">{{tournamentDataSrv.leftTeamName}}</div>
-            </div>
-            <div class="col-sm-2">
-              <div ng-class="tournamentDataSrv.leftTeamName" class="text-center scorerpanel">{{finalResult().scoreL}}</div>
-            </div>
-            <div class="col-sm-2">
-              <div ng-class="tournamentDataSrv.rightTeamName" class="text-center scorerpanel">{{finalResult().scoreR}}</div>
-            </div>
-            <div class="col-sm-4">
-              <div class="row text-center scorerpanel">{{tournamentDataSrv.rightTeamName}}</div>
-            </div>
-          </h3>
+      <div class="hidden-xs">
+        <div class="row">
+          <div class="col-sm-11">
+            <h3 class="row">
+              <div class="col-sm-4">
+                <div class="row text-center scorerpanel">{{tournamentDataSrv.leftTeamName}}</div>
+              </div>
+              <div class="col-sm-2">
+                <div ng-class="tournamentDataSrv.leftTeamName" class="text-center scorerpanel">{{finalResult().scoreL}}</div>
+              </div>
+              <div class="col-sm-2">
+                <div ng-class="tournamentDataSrv.rightTeamName" class="text-center scorerpanel">{{finalResult().scoreR}}</div>
+              </div>
+              <div class="col-sm-4">
+                <div class="row text-center scorerpanel">{{tournamentDataSrv.rightTeamName}}</div>
+              </div>
+            </h3>
+          </div>
+          <div class="col-sm-1">
+            <!--h3.btn.btn-primary(ng-click='reloadResults()')-->
+            <!--    span.glyphicon.glyphicon-refresh(ng-class="refreshing")-->
+          </div>
         </div>
-        <div class="col-sm-1">
-          <h3 ng-click="reloadResults()" class="btn btn-primary"><span ng-class="refreshing" class="glyphicon glyphicon-refresh"></span></h3>
+        <div class="row">
+          <div class="col-sm-11">
+            <div ng-class="statusStyle" class="small text-center">{{refreshStatus}}</div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-11">
+            <div class="small text-center">Actualización automática en {{nextRefresh}} segundos</div>
+          </div>
         </div>
       </div>
       <!-- Mobile design-->
-      <div class="row scorerpanel visible-xs">
-        <div class="col-xs-8 text-left"><strong>{{tournamentDataSrv.leftTeamName}}</strong></div>
-        <div ng-class="tournamentDataSrv.leftTeamName" class="col-xs-4 text-center"><strong>{{finalResult().scoreL}}</strong></div>
-        <div class="col-xs-8 text-left"><strong>{{tournamentDataSrv.rightTeamName}}</strong></div>
-        <div ng-class="tournamentDataSrv.rightTeamName" class="col-xs-4 text-center"><strong>{{finalResult().scoreR}}</strong></div>
+      <div class="visible-xs">
+        <div class="row scorerpanel">
+          <div class="col-xs-8 text-left"><strong>{{tournamentDataSrv.leftTeamName}}</strong></div>
+          <div ng-class="tournamentDataSrv.leftTeamName" class="col-xs-4 text-center"><strong>{{finalResult().scoreL}}</strong></div>
+          <div class="col-xs-8 text-left"><strong>{{tournamentDataSrv.rightTeamName}}</strong></div>
+          <div ng-class="tournamentDataSrv.rightTeamName" class="col-xs-4 text-center"><strong>{{finalResult().scoreR}}</strong></div>
+        </div>
+        <div class="row">
+          <div ng-class="statusStyle" class="small text-center">{{refreshStatus}}</div>
+        </div>
+        <div class="row">
+          <div class="small text-center">Actualización automática en {{nextRefresh}} segundos</div>
+        </div>
       </div>
     </div>
   </div>

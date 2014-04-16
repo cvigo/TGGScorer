@@ -6,7 +6,16 @@
  */
 
 
-var _API_PATH = "/_ah/api/mpscorer";
+var _SERVER = "";
+
+
+if ( document.URL.indexOf( 'http://' ) === -1 && document.URL.indexOf( 'https://' ) === -1 ) // app running locally
+{
+    _SERVER = "https://tggscorer.appspot.com";
+}
+
+
+var _API_PATH = _SERVER + "/_ah/api/mpscorer";
 var _API_VERSION = "v1";
 
 var serverModule = angular.module("BackendModule", ["ngResource"]);

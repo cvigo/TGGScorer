@@ -3,6 +3,7 @@ div(ng-init='initModel()', xmlns='http://www.w3.org/1999/html')
         div.container-fluid
             div.row
                 div.col-xs-2
+                    //div Sig. actualización: {{nextRefresh}}
                     button.btn.btn-sm.btn-default.navbar-text(ng-click='reloadResults()')
                         span.glyphicon.glyphicon-refresh(ng-class="refreshing")
                 div.col-xs-10.col-sm-5
