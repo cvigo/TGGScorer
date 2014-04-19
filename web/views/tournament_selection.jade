@@ -5,7 +5,7 @@ div(ng-init='initApp()', xmlns='http://www.w3.org/1999/html')
             .panel-heading
                 h3.panel-title Selección de torneo
             .panel-body
-                form#tournament-form(role='form', ng-submit='playTournament(passKey, $event)')
+                form#tournament-form(role='form', ng-submit='playTournament(passKey)')
                     label(for='passkey') Palabra clave:
                     input#passkey.form-control(placeholder='palabra clave', type='text', autofocus='true', ng-model='passKey', ng-change='passkeyChange(passKey)')
                     br

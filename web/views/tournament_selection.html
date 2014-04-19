@@ -6,7 +6,7 @@
         <h3 class="panel-title">Selección de torneo</h3>
       </div>
       <div class="panel-body">
-        <form id="tournament-form" role="form" ng-submit="playTournament(passKey, $event)">
+        <form id="tournament-form" role="form" ng-submit="playTournament(passKey)">
           <label for="passkey">Palabra clave:</label>
           <input id="passkey" placeholder="palabra clave" type="text" autofocus="true" ng-model="passKey" ng-change="passkeyChange(passKey)" class="form-control"/><br/>
           <div class="row">

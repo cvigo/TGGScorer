@@ -57,6 +57,7 @@ appModule.controller("MainCtrl",
     $scope.playerList = []; // this feeds the players filter in the model
     $scope.groups = [];   // this creates a visual representation of the matches, sorted and grouped by tee time. It keeps references to the tournamentDataSrv data
     $scope.refreshing = "null";
+    $scope.passKey = "";
 
     $scope.frequentTeams = ["Cosacos", "Bucaneros", "Corsarios", "Filibusteros"];
 
@@ -110,7 +111,7 @@ appModule.controller("MainCtrl",
  * @description
  * Calculates the score projection given the current individual match progress.
  *
- * @return {int, int} projected points accumulated by team on the left, projected points accumulated by team on the right
+ * @return {{scoreL: number, scoreR: number}} projected points accumulated by team on the left, projected points accumulated by team on the right
  */
     $scope.projectedResult = function()
     {
@@ -128,7 +129,7 @@ appModule.controller("MainCtrl",
             }
         }
         return {scoreL:scoreLeft, scoreR:scoreRight};
-    }
+    };
 
 /**
  * @ngdoc function
@@ -139,7 +140,7 @@ appModule.controller("MainCtrl",
  * Calculates the points that each team has secured. If a player is "dormie", he is given 0.5
  * (that will be 1 unless he loses all remaining holes)
  *
- * @return {int, int} secured points by team on the left, secured points by team on the right
+ * @return {{scoreL: number, scoreR: number}} secured points by team on the left, secured points by team on the right
  */
     $scope.finalResult = function()
     {
@@ -165,7 +166,7 @@ appModule.controller("MainCtrl",
             }
         }
         return {scoreL:scoreLeft, scoreR:scoreRight};
-    }
+    };
 
 /**
  * @ngdoc function
@@ -183,7 +184,7 @@ appModule.controller("MainCtrl",
             function(tournamentData)
             {
                 // get results in a single call
-                // Result.query wont't not work because GAE does not return an array. Instead it returns an object that
+                // Result.query won't not work because GAE does not return an array. Instead it returns an object that
                 // contains a property called "items" which is the array
                 Result.get({tournamentID:tournamentId},
                            function(resultsArray)  // success callback
@@ -192,7 +193,7 @@ appModule.controller("MainCtrl",
                                $scope.resultsSrv = SharedProperties.getResultsSrv();
 
                                // results come in the same order than matches in Tournament call
-                               for (match in SharedProperties.getTournamentDataSrv().matches)
+                               for (var match in SharedProperties.getTournamentDataSrv().matches)
                                {
                                    //store the reference to the result, so futures updates to the results object are automatically loaded into the template
                                    SharedProperties.getTournamentDataSrv().matches[match].result = SharedProperties.getResultsSrv()[match];
@@ -219,7 +220,8 @@ appModule.controller("MainCtrl",
                 $scope.displayAlertMessage("danger", errMsg.data.error.message, 0);
             }
         ));
-    }
+    };
+
 /**
  * @ngdoc function
  * @name $scope.reloadResults
@@ -232,7 +234,6 @@ appModule.controller("MainCtrl",
     {
         $scope.refreshing = "rotating"; // this applies "rotating" class to the refresh button
         $scope.refreshStatus = MsgText.LOADING;
-        var anyUpdate = false;
 
         Result.get({tournamentID:$routeParams.tournamentID},
             function(resultsArray)  // success callback
@@ -281,7 +282,8 @@ appModule.controller("MainCtrl",
             }
 
         );
-    }
+    };
+
 
     /**
      * @ngdoc function
@@ -294,38 +296,41 @@ appModule.controller("MainCtrl",
      */
     $scope.markAsChanged = function(matchId)
     {
-        $("#match_desktop_"+matchId).addClass("ng-hide-add");
-        $("#match_mobile_"+matchId).addClass("ng-hide-add");
+        var matchDesktop = $("#match_desktop_"+matchId);
+        var matchMobile = $("#match_mobile_"+matchId);
+
+        matchDesktop.addClass("ng-hide-add");
+        matchMobile.addClass("ng-hide-add");
         $timeout(function()
                  {
-                     $("#match_desktop_"+matchId).removeClass("ng-hide-add");
-                     $("#match_desktop_"+matchId).addClass("ng-hide-remove");
-                     $("#match_mobile_"+matchId).removeClass("ng-hide-add");
-                     $("#match_mobile_"+matchId).addClass("ng-hide-remove");
+                     matchDesktop.removeClass("ng-hide-add");
+                     matchDesktop.addClass("ng-hide-remove");
+                     matchMobile.removeClass("ng-hide-add");
+                     matchMobile.addClass("ng-hide-remove");
                      $("#match_desktop_"+matchId+"_lastupdate").addClass("blinking");
                      $timeout(function()
                               {
-                                  $("#match_desktop_"+matchId).removeClass("ng-hide-remove");
-                                  $("#match_mobile_"+matchId).removeClass("ng-hide-remove");
+                                  matchDesktop.removeClass("ng-hide-remove");
+                                  matchMobile.removeClass("ng-hide-remove");
                               },
                               animationTime
                      );
                  },
                  animationTime
         );
-    }
+    };
 
     $scope.markAsUnchanged = function(matchId)
     {
         $("#match_desktop_"+matchId+"_lastupdate").removeClass("blinking");
-    }
+    };
 
     /**
      * @ngdoc function
      * @name $scope.sendResult
      * @function
      * @param {number} groupNumber The group number as displayed in the template (= array index +1)
-     * @param {Object event} DOM element that fired the event
+     * @param {Object} event DOM element that fired the event
      *
      * @description
       * Sends the group results to the Server
@@ -359,7 +364,7 @@ appModule.controller("MainCtrl",
                     $timeout(function () {btn.button("reset")}, errorMsgTime);
                 });
         }
-    }
+    };
 
     /**
      * @ngdoc function
@@ -396,7 +401,7 @@ appModule.controller("MainCtrl",
             }
 
         }
-    }
+    };
 
     /**
      * @ngdoc function
@@ -424,7 +429,7 @@ appModule.controller("MainCtrl",
                                         return 0;
                                 }
                             });
-    }
+    };
 
 
 /**
@@ -468,13 +473,13 @@ appModule.controller("MainCtrl",
         $scope.setPassKeyHeader();
 
         $scope.doAutoRefresh = autorefresh;
-    }
+    };
 
     $scope.initApp = function()
     {
         $scope.passKey = window.localStorage.getItem("passKey");
         $scope.passkeyChange($scope.passKey);
-    }
+    };
 
 
 
@@ -494,7 +499,7 @@ appModule.controller("MainCtrl",
             $scope.playerList.push(SharedProperties.getTournamentDataSrv().matches[match].leftPlayer);
             $scope.playerList.push(SharedProperties.getTournamentDataSrv().matches[match].rightPlayer);
         }
-    }
+    };
 
 
 /**
@@ -515,7 +520,7 @@ appModule.controller("MainCtrl",
         }
 
         return ret;
-    }
+    };
 
 
 
@@ -556,7 +561,7 @@ appModule.controller("MainCtrl",
                 return {text:(headingPlayer + " " + absResult + " UP"), finished:false};
 
         }
-    }
+    };
 
 
 /**
@@ -590,7 +595,7 @@ appModule.controller("MainCtrl",
                 break;
 
         }
-    }
+    };
 
 /**
  * @ngdoc function
@@ -623,7 +628,7 @@ appModule.controller("MainCtrl",
                 break;
 
         }
-    }
+    };
 
 /**
  * @ngdoc function
@@ -676,7 +681,7 @@ appModule.controller("MainCtrl",
         else
         return "allsquare";
 
-    }
+    };
 
     /**
      * @ngdoc function
@@ -704,24 +709,26 @@ appModule.controller("MainCtrl",
 
         if (timeOut > 0)
             $scope.alertTimeout = $timeout(function(){$scope.alertVisible = false;}, timeOut);
-    }
+    };
 
     /**
      * @ngdoc function
      * @name $scope.searchTournament
      * @function
      *
-     * @param {passKey} the passkey to be used as search param
      * @description
      * Searches a tournament by passkey. If succeeds, opens the player view screen
      *
+     * @param passKey Tournament passkey udes in the search
+     * @param successFn function called if search suceeds
+     * @param errorFn function called if search fails
      */
     $scope.searchTournament = function(passKey, successFn, errorFn)
     {
         return Tournament.get({tournamentID:$routeParams.tournamentID, passKey:passKey}, successFn, errorFn);
-    }
+    };
 
-    $scope.playTournament = function(passKey, event)
+    $scope.playTournament = function(passKey)
     {
         $("#btn-send").button("loading");
 
@@ -739,7 +746,7 @@ appModule.controller("MainCtrl",
                                     $timeout(function () {$("#btn-send").button("reset")}, errorMsgTime);
                                 }
         );
-    }
+    };
 
 
     $scope.editTournament = function(passKey, event)
@@ -761,12 +768,12 @@ appModule.controller("MainCtrl",
                                     $timeout(function () {btn.button("reset")}, errorMsgTime);
                                 }
         );
-    }
+    };
 
     /**
      * @ngdoc function
      * @name $scope.passkeyChange
-     * @param {passKey} the passkey typed
+     * @param {string} passKey the passkey typed
      * @function
      *
      * @description
@@ -777,8 +784,7 @@ appModule.controller("MainCtrl",
     {
         $scope.alertVisible = false;
         $scope.searchTournamentEnabled = passKey.length > 3;
-
-    }
+    };
 
     $scope.setPassKeyHeader = function()
     {
@@ -786,7 +792,7 @@ appModule.controller("MainCtrl",
         $http.defaults.headers.put["x-PassKey"] = $scope.passKey;
         $http.defaults.headers.delete =  {"x-PassKey": $scope.passKey};
         $http.defaults.headers.patch["x-PassKey"] = $scope.passKey;
-    }
+    };
 
 
     $scope.dateOptions =
@@ -814,12 +820,12 @@ appModule.controller("MainCtrl",
         var len = SharedProperties.getTournamentDataSrv().matches.push({orderInGroup: matchIndex, rightPlayer:"", leftPlayer:"", startTime: SharedProperties.getGroups()[groupIndex].startTime});
         SharedProperties.getGroups()[groupIndex].matches.splice(matchIndex, 0,SharedProperties.getTournamentDataSrv().matches[len-1]);
         $scope.reindexMatches(groupIndex);
-    }
+    };
 
     $scope.removeMatch = function(match)
     {
         SharedProperties.getTournamentDataSrv().matches.splice(SharedProperties.getTournamentDataSrv().matches.indexOf(match), 1);
-    }
+    };
 
     $scope.removeMatchFromGroup = function(groupIndex, matchIndex)
     {
@@ -836,7 +842,7 @@ appModule.controller("MainCtrl",
             matches.splice(matchIndex, 1);
 
         $scope.reindexMatches(groupIndex);
-    }
+    };
 
     $scope.reindexMatches = function(groupIndex)
     {
@@ -848,14 +854,14 @@ appModule.controller("MainCtrl",
             matches[i].startTime = SharedProperties.getGroups()[groupIndex].startTime;
         }
 
-    }
+    };
 
     $scope.reindexGroups = function()
     {
         var i=0;
         for (i=0; i<SharedProperties.getGroups().length; ++i)
             $scope.reindexMatches(i);
-    }
+    };
 
     $scope.addGroup = function(groupIndex)
     {
@@ -870,7 +876,7 @@ appModule.controller("MainCtrl",
         SharedProperties.getGroups().splice(groupIndex, 0, {startTime: startTime});
         $scope.addMatchToGroup(groupIndex, 0);
         $scope.reindexGroups();
-    }
+    };
 
     $scope.removeGroup = function(groupIndex)
     {
@@ -892,13 +898,13 @@ appModule.controller("MainCtrl",
             SharedProperties.getGroups().splice(groupIndex, 1);
 
         $scope.reindexGroups();
-    }
+    };
 
     $scope.newTournament = function()
     {
         window.location = '#/edit/new';
 
-    }
+    };
 
     $scope.putTournament = function()
     {
@@ -942,13 +948,13 @@ appModule.controller("MainCtrl",
             });
 
 
-    }
+    };
 
     $scope.propagateDates = function()
     {
         $scope.setMatchesTimeToGroupTime();
         $scope.setMatchesDateToTournamentDate();
-    }
+    };
 
     $scope.setMatchesDateToTournamentDate = function()
     {
@@ -964,7 +970,7 @@ appModule.controller("MainCtrl",
             console.log("setMatchesDateToTournamentDate: " + SharedProperties.getTournamentDataSrv().matches[i].id + ": " + SharedProperties.getTournamentDataSrv().matches[i].leftPlayer + " vs " + SharedProperties.getTournamentDataSrv().matches[i].rightPlayer + "; time:" + SharedProperties.getTournamentDataSrv().matches[i].startTime);
 
         }
-    }
+    };
 
     $scope.setMatchesTimeToGroupTime = function()
     {
@@ -975,12 +981,11 @@ appModule.controller("MainCtrl",
                 SharedProperties.getGroups()[i].matches[j].startTime = SharedProperties.getGroups()[i].startTime;
                 console.log("setMatchesTimeToGroupTime: " + SharedProperties.getGroups()[i].matches[j].leftPlayer + " vs " + SharedProperties.getGroups()[i].matches[j].rightPlayer + "; time:" + SharedProperties.getGroups()[i].matches[j].startTime);
             }
-    }
+    };
 
     $scope.validateTournament = function()
     {
-        return
-            (
+        return (
                 SharedProperties.getTournamentDataSrv().leftTeamName != null && !SharedProperties.getTournamentDataSrv().leftTeamName.isEmpty()
                 &&
                 SharedProperties.getTournamentDataSrv().rightTeamName != null && !SharedProperties.getTournamentDataSrv().rightTeamName.isEmpty()
@@ -995,7 +1000,7 @@ appModule.controller("MainCtrl",
                 &&
                 SharedProperties.getTournamentDataSrv().leftTeamName != null && !SharedProperties.getTournamentDataSrv().leftTeamName.isEmpty()
             );
-    }
+    };
 
 
     $scope.scheduleAutoRefresh = function()
@@ -1033,7 +1038,7 @@ appModule.controller("MainCtrl",
                                      },
                                      1000);
 
-    }
+    };
 
     $scope.stopAutoRefresh = function()
     {
@@ -1061,11 +1066,11 @@ appModule.controller("MainCtrl",
         if ( document.URL.indexOf( 'http://' ) === -1 && document.URL.indexOf( 'https://' ) === -1 ) // app running locally
         {
             console.log("Opening " + $scope.scorePanelURL + " in _system");
-            window.open($scope.scorePanelURL, '_system'); // this makes sure that PhoneGap opens the link in a mobile default browser
+            window.open($scope.scorePanelURL, '_system'); // this makes sure that PhoneGap opens the link in the mobile default browser
         }
         else
-            window.open($scope.scorePanelURL);
-    }
+            window.open($scope.scorePanelURL, '_blank');
+    };
 
 }]);
 
