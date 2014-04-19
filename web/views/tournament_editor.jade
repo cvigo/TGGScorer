@@ -5,9 +5,9 @@ div(ng-init='initModel()', xmlns='http://www.w3.org/1999/html')
                 div(collapse='!alertVisible')
                     alert#alertPanel(type='lastMessage.type', close='alertVisible=false') {{lastMessage.text}}
             div.col-xs-12
-                a(href="{{scorePanelURL}}", target="_blank", ng-show="tournamentSaved")
-                    button#btn-openscorer.btn.btn-info.btn-sm.navbar-text.pull-right(form="tournament-form",
-                                                                                  type='button')
+                button#btn-openscorer.btn.btn-info.btn-sm.navbar-text.pull-right(form="tournament-form",
+                                                                                  type='button',
+                                                                                  ng-click="openScorerPanel()")
                                                                                   |Enlace al marcador
                 button#btn-save.btn.btn-primary.btn-sm.navbar-text.pull-right(form="tournament-form",
                                                                               type='submit'
@@ -15,6 +15,7 @@ div(ng-init='initModel()', xmlns='http://www.w3.org/1999/html')
                                                                               data-found-text='Grabado!',
                                                                               data-error-text='ERROR :-(')
                                                                               |Grabar Torneo
+            //div.col-xs-12 {{scorePanelURL}}
     div.container-fluid(style='padding-top: 65px;')
         // TODO add error panel
         form#tournament-form.form(role='form', ng-submit='putTournament()')

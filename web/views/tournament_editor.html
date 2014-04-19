@@ -7,10 +7,11 @@
           <alert id="alertPanel" type="lastMessage.type" close="alertVisible=false">{{lastMessage.text}}</alert>
         </div>
       </div>
-      <div class="col-xs-12"><a href="{{scorePanelURL}}" target="_blank" ng-show="tournamentSaved">
-          <button id="btn-openscorer" form="tournament-form" type="button" class="btn btn-info btn-sm navbar-text pull-right">Enlace al marcador</button></a>
+      <div class="col-xs-12">
+        <button id="btn-openscorer" form="tournament-form" type="button" ng-click="openScorerPanel()" class="btn btn-info btn-sm navbar-text pull-right">Enlace al marcador</button>
         <button id="btn-save" form="tournament-form" type="submit" data-loading-text="Grabando..." data-found-text="Grabado!" data-error-text="ERROR :-(" class="btn btn-primary btn-sm navbar-text pull-right">Grabar Torneo</button>
       </div>
+      <!--div.col-xs-12 {{scorePanelURL}}-->
     </div>
   </nav>
   <div style="padding-top: 65px;" class="container-fluid">

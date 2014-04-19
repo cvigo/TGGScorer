@@ -455,7 +455,13 @@ appModule.controller("MainCtrl",
         {
             $scope.loadTournament($routeParams.tournamentID);
             $scope.passKey = window.localStorage.getItem("passKey");
-            $scope.scorePanelURL = window.location.protocol + "//" + window.location.host + "/#/scorerView/" + $routeParams.tournamentID;
+
+            if ( document.URL.indexOf( 'http://' ) === -1 && document.URL.indexOf( 'https://' ) === -1 ) // app running locally
+                $scope.scorePanelURL = "https://tggscorer.appspot.com/#/scorerView/" + $routeParams.tournamentID;
+            else
+                $scope.scorePanelURL = window.location.protocol + "//" + window.location.host + "/#/scorerView/" + $routeParams.tournamentID;
+
+
             $scope.tournamentSaved = true;
         }
 
@@ -1048,6 +1054,18 @@ appModule.controller("MainCtrl",
         // Make sure that the interval is destroyed too
         $scope.stopAutoRefresh();
     });
+
+    $scope.openScorerPanel = function()
+    {
+        //window.alert($scope.scorePanelURL);
+        if ( document.URL.indexOf( 'http://' ) === -1 && document.URL.indexOf( 'https://' ) === -1 ) // app running locally
+        {
+            console.log("Opening " + $scope.scorePanelURL + " in _system");
+            window.open($scope.scorePanelURL, '_system'); // this makes sure that PhoneGap opens the link in a mobile default browser
+        }
+        else
+            window.open($scope.scorePanelURL);
+    }
 
 }]);
 
